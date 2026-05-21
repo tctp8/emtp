@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EMTP 41種核心藥物發音與速記工具 v2</title>
+    <title>EMTP 聲音工具 v3.1</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -117,153 +117,201 @@
             font-weight: bold;
             display: inline-block;
         }
+
+        /* 🛑 方案 A: 停止播放所有聲音按鈕樣式 */
+        .stop-all-btn {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 14px 20px;
+            font-size: 1.05rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 20px auto;
+            display: block;
+            width: 100%;
+            max-width: 800px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+            transition: transform 0.1s;
+            text-align: center;
+        }
+        .stop-all-btn:active {
+            transform: scale(0.98);
+        }
     </style>
 </head>
 <body>
-<div class="breath-sound-container">
-  <h3 class="section-title">🫁 EMTP 必考：5種異常呼吸音真實聽診複習</h3>
-  
-  <div class="sound-buttons">
-    <button class="sound-btn" onclick="playBreathSound('fine', this)">1. Fine Crackles 🔊</button>
-    <button class="sound-btn" onclick="playBreathSound('coarse', this)">2. Coarse Crackles 🔊</button>
-    <button class="sound-btn" onclick="playBreathSound('wheezing', this)">3. Wheezing 🔊</button>
-    <button class="sound-btn" onclick="playBreathSound('rhonchi', this)">4. Rhonchi 🔊</button>
-    <button class="sound-btn" onclick="playBreathSound('stridor', this)">5. Stridor 🔊</button>
-  </div>
 
-  <div id="sound-panel" class="sound-panel" style="display: none;">
-    <div class="panel-header">
-      <h4 id="sound-title">呼吸音名稱</h4>
-      <div class="audio-controls">
-        <span id="playing-status" style="font-size: 0.85rem; color: #d31027; font-weight: bold; margin-right: 10px; display:none;">🎵 音訊播放中...</span>
-        <button class="copy-btn" onclick="copySoundName()">📋 複製英文名稱</button>
-      </div>
+<div class="container">
+    <h1>EMTP 救護萬用複習工具</h1>
+    <div class="subtitle">👨‍🚒 提示：呼吸音再點一次可暫停；下方藥物英文點擊皆可由手機直接發音</div>
+
+    <div class="breath-sound-container">
+        <h3 class="section-title">🫁 EMTP 必考：5種異常呼吸音真實聽診複習</h3>
+        
+        <div class="sound-buttons">
+            <button class="sound-btn" onclick="playBreathSound('fine', this)">1. Fine Crackles 🔊</button>
+            <button class="sound-btn" onclick="playBreathSound('coarse', this)">2. Coarse Crackles 🔊</button>
+            <button class="sound-btn" onclick="playBreathSound('wheezing', this)">3. Wheezing 🔊</button>
+            <button class="sound-btn" onclick="playBreathSound('rhonchi', this)">4. Rhonchi 🔊</button>
+            <button class="sound-btn" onclick="playBreathSound('stridor', this)">5. Stridor 🔊</button>
+        </div>
+        
+
+        <div id="sound-panel" class="sound-panel" style="display: none;">
+            <div class="panel-header">
+                <h4 id="sound-title">呼吸音名稱</h4>
+                <div class="audio-controls">
+                    <span id="playing-status" style="font-size: 0.85rem; color: #d31027; font-weight: bold; margin-right: 10px; display:none;">🎵 音訊播放中...</span>
+                    <button class="copy-btn" onclick="copySoundName()">📋 複製英文名稱</button>
+                </div>
+            </div>
+            
+            <div class="info-grid">
+                <div class="info-item"><strong>🔊 聲音性質：</strong> <span id="sound-nature">--</span></div>
+                <div class="info-item"><strong>🎯 常見聽診位置：</strong> <span id="sound-location">--</span></div>
+                <div class="info-item"><strong>🌬️ 吸吐氣期：</strong> <span id="sound-phase" class="badge">--</span></div>
+            </div>
+
+            <div class="clinical-box">
+                <strong>🏥 臨床鑑別診斷 (Differential Diagnosis)：</strong>
+                <p id="sound-ddx">--</p>
+            </div>
+        </div>
     </div>
+
     
-    <div class="info-grid">
-      <div class="info-item"><strong>🔊 聲音性質：</strong> <span id="sound-nature">--</span></div>
-      <div class="info-item"><strong>🎯 常見聽診位置：</strong> <span id="sound-location">--</span></div>
-      <div class="info-item"><strong>🌬️ 吸吐氣期：</strong> <span id="sound-phase" class="badge">--</span></div>
-    </div>
 
-    <div class="clinical-box">
-      <strong>🏥 臨床鑑別診斷 (Differential Diagnosis)：</strong>
-      <p id="sound-ddx">--</p>
+    <h2>第一部分：純發音專區（點擊即可發音）</h2>
+    <div class="grid-container" id="cardGrid"></div>
+
+    <h2>第二部分：機轉與急救適應症速記對照表（點擊英文欄位亦可發音）</h2>
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>藥物名稱 (英文/縮寫) 點擊發音</th>
+                    <th>中文名稱/分類</th>
+                    <th>EMTP 臨床主要適應症 / 機轉速記</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+        </table>
     </div>
-  </div>
 </div>
 
-<audio id="audio-fine" src="https://www.easyauscultation.com/media/7d14db0b-e4f6-4fbf-939e-4e4fe62e08ec/rales-fine.mp3" preload="auto"></audio>
-<audio id="audio-coarse" src="https://www.easyauscultation.com/media/745fdf2f-8703-49d7-84da-508b9f67a21f/rales-coarse.mp3" preload="auto"></audio>
-<audio id="audio-wheezing" src="https://edge.sitecorecloud.io/mmanual-ssq1ci05/media/professional/sounds/wheezing.mp3?thn=0" preload="auto"></audio>
-<audio id="audio-rhonchi" src="https://www.easyauscultation.com/media/dfb10766-3d23-42e1-9505-1a1343714bda/rhonchi.mp3" preload="auto"></audio>
-<audio id="audio-stridor" src="http://www.rale.ca/media/stridor.wav" preload="auto"></audio>
+<audio id="audio-fine" src="mp3/fine_crackles.mp3" preload="auto"></audio>
+<audio id="audio-coarse" src="mp3/coarse_crackles.mp3" preload="auto"></audio>
+<audio id="audio-wheezing" src="mp3/wheezing.mp3" preload="auto"></audio>
+<audio id="audio-rhonchi" src="mp3/rhonchi.mp3" preload="auto"></audio>
+<audio id="audio-stridor" src="mp3/stridor.mp3" preload="auto"></audio>
 
 <style>
-  .breath-sound-container {
-    background: #f4f7f6;
-    border: 2px solid #3a6073;
-    border-radius: 12px;
-    padding: 15px;
-    margin: 10px auto;
-    max-width: 800px;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-  }
-  .section-title {
-    color: #2c3e50;
-    margin-top: 0;
-    margin-bottom: 12px;
-    font-size: 1.15rem;
-    border-bottom: 2px solid #3a6073;
-    padding-bottom: 5px;
-  }
-  .sound-buttons {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-    gap: 8px;
-    margin-bottom: 12px;
-  }
-  .sound-btn {
-    background: linear-gradient(135deg, #3a6073, #3a7bd5);
-    color: white;
-    border: none;
-    border-radius: 6px;
-    padding: 12px 5px;
-    font-size: 0.9rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: transform 0.1s, opacity 0.2s;
-  }
-  .sound-btn:active {
-    transform: scale(0.95);
-  }
-  .sound-btn.active-btn {
-    background: linear-gradient(135deg, #d31027, #ea384d);
-    box-shadow: 0 0 8px rgba(211, 16, 39, 0.5);
-  }
-  .sound-panel {
-    background: white;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 15px;
-    animation: fadeIn 0.3s ease-in-out;
-  }
-  .panel-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-    border-bottom: 1px dashed #ccc;
-    padding-bottom: 5px;
-  }
-  #sound-title {
-    margin: 0;
-    color: #d31027;
-    font-size: 1.2rem;
-  }
-  .audio-controls {
-    display: flex;
-    align-items: center;
-  }
-  .copy-btn {
-    background: #e0e0e0;
-    border: none;
-    border-radius: 4px;
-    padding: 4px 8px;
-    font-size: 0.8rem;
-    cursor: pointer;
-  }
-  .copy-btn:hover { background: #d5d5d5; }
-  .info-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 8px;
-    margin-bottom: 12px;
-    font-size: 0.95rem;
-  }
-  @media(min-width: 600px) {
-    .info-grid { grid-template-columns: repeat(3, 1fr); }
-  }
-  .badge {
-    background-color: #ffe6e6;
-    color: #c0392b;
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-weight: bold;
-  }
-  .clinical-box {
-    background: #fff9e6;
-    border-left: 4px solid #f39c12;
-    padding: 10px;
-    border-radius: 0 4px 4px 0;
-    font-size: 0.9rem;
-  }
-  .clinical-box p { margin: 5px 0 0 0; color: #555; }
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-5px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
+    .breath-sound-container {
+        background: #f4f7f6;
+        border: 2px solid #3a6073;
+        border-radius: 12px;
+        padding: 15px;
+        margin: 10px auto;
+        max-width: 800px;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .section-title {
+        color: #2c3e50;
+        margin-top: 0;
+        margin-bottom: 12px;
+        font-size: 1.15rem;
+        border-bottom: 2px solid #3a6073;
+        padding-bottom: 5px;
+    }
+    .sound-buttons {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+        gap: 8px;
+        margin-bottom: 12px;
+    }
+    .sound-btn {
+        background: linear-gradient(135deg, #3a6073, #3a7bd5);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        padding: 12px 5px;
+        font-size: 0.9rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: transform 0.1s, opacity 0.2s;
+    }
+    .sound-btn:active {
+        transform: scale(0.95);
+    }
+    .sound-btn.active-btn {
+        background: linear-gradient(135deg, #d31027, #ea384d);
+        box-shadow: 0 0 8px rgba(211, 16, 39, 0.5);
+    }
+    .sound-panel {
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 15px;
+        animation: fadeIn 0.3s ease-in-out;
+    }
+    .panel-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+        border-bottom: 1px dashed #ccc;
+        padding-bottom: 5px;
+    }
+    #sound-title {
+        margin: 0;
+        color: #d31027;
+        font-size: 1.2rem;
+    }
+    .audio-controls {
+        display: flex;
+        align-items: center;
+    }
+    .copy-btn {
+        background: #e0e0e0;
+        border: none;
+        border-radius: 4px;
+        padding: 4px 8px;
+        font-size: 0.8rem;
+        cursor: pointer;
+    }
+    .copy-btn:hover { background: #d5d5d5; }
+    .info-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 8px;
+        margin-bottom: 12px;
+        font-size: 0.95rem;
+    }
+    @media(min-width: 600px) {
+        .info-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    .badge {
+        background-color: #ffe6e6;
+        color: #c0392b;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-weight: bold;
+    }
+    .clinical-box {
+        background: #fff9e6;
+        border-left: 4px solid #f39c12;
+        padding: 10px;
+        border-radius: 0 4px 4px 0;
+        font-size: 0.9rem;
+    }
+    .clinical-box p { margin: 5px 0 0 0; color: #555; }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-5px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
 </style>
 
 <script>
@@ -306,9 +354,24 @@
   };
 
   let currentAudio = null;
+  let currentType = null; // 紀錄目前正在播放的種類
 
   function playBreathSound(type, btnElement) {
-    // 1. 先暫停目前正在播放的任何音訊
+    const targetAudio = document.getElementById('audio-' + type);
+    const statusText = document.getElementById('playing-status');
+
+    // 🛑 【方案 B】開關切換機制：如果點擊的是「同一個」正在播放的按鈕，就暫停
+    if (currentAudio && currentType === type && !currentAudio.paused) {
+      currentAudio.pause();
+      currentAudio.currentTime = 0;
+      btnElement.classList.remove('active-btn');
+      if (statusText) statusText.style.display = 'none';
+      currentAudio = null;
+      currentType = null;
+      return; // 提早結束
+    }
+
+    // 如果是切換新音訊，先停掉前一個
     if (currentAudio) {
       currentAudio.pause();
       currentAudio.currentTime = 0;
@@ -328,25 +391,49 @@
     btnElement.classList.add('active-btn');
 
     // 4. 播放對應的真實音檔
-    const targetAudio = document.getElementById('audio-' + type);
-    const statusText = document.getElementById('playing-status');
-    
     if (targetAudio) {
       currentAudio = targetAudio;
-      statusText.style.display = 'inline';
+      currentType = type;
+      if (statusText) statusText.style.display = 'inline';
       
-      // 嘗試播放音訊
       targetAudio.play().catch(err => {
         console.log("音訊播放受阻:", err);
-        statusText.style.display = 'none';
-        
+        if (statusText) statusText.style.display = 'none';
       });
 
-      // 音訊結束時隱藏狀態
+      // 音訊結束時隱藏狀態與高亮
       targetAudio.onended = function() {
-        statusText.style.display = 'none';
+        if (statusText) statusText.style.display = 'none';
+        btnElement.classList.remove('active-btn');
+        currentAudio = null;
+        currentType = null;
       };
     }
+  }
+
+  // 🛑 【方案 A】一鍵全靜音（藥物發音與呼吸音一起停）
+  function stopAllSounds() {
+    // 1. 停止藥物發音 (Speech)
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
+    
+    // 2. 停止所有呼吸音 MP3
+    const audios = document.querySelectorAll('audio');
+    audios.forEach(audio => {
+      audio.pause();
+      audio.currentTime = 0;
+    });
+
+    // 3. 重設網頁 UI 狀態
+    const statusText = document.getElementById('playing-status');
+    if (statusText) statusText.style.display = 'none';
+    
+    const buttons = document.querySelectorAll('.sound-btn');
+    buttons.forEach(btn => btn.classList.remove('active-btn'));
+    
+    currentAudio = null;
+    currentType = null;
   }
 
   function copySoundName() {
@@ -360,27 +447,6 @@
     });
   }
 </script>
-<div class="container">
-    <h1>EMTP 必備藥物發音字卡</h1>
-    <div class="subtitle">👨‍🚒 提示：不論是上半部字卡、或下半部表格的英文名稱，<b>點擊皆可直接發音</b></div>
-
-    <h2>第一部分：純發音專區（點擊即可發音）</h2>
-    <div class="grid-container" id="cardGrid"></div>
-
-    <h2>第二部分：機轉與急救適應症速記對照表（點擊英文欄位亦可發音）</h2>
-    <div class="table-responsive">
-        <table>
-            <thead>
-                <tr>
-                    <th>藥物名稱 (英文/縮寫) 點擊發音</th>
-                    <th>中文名稱/分類</th>
-                    <th>EMTP 臨床主要適應症 / 機轉速記</th>
-                </tr>
-            </thead>
-            <tbody id="tableBody"></tbody>
-        </table>
-    </div>
-</div>
 
 <script>
 // 41種藥物完整資料庫
@@ -467,6 +533,7 @@ drugs.forEach((drug) => {
 // 語音播放
 function speakDrug(text) {
     if ('speechSynthesis' in window) {
+        // 播放新藥物前，先清除正在發音的語音
         window.speechSynthesis.cancel();
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = 'en-US';
