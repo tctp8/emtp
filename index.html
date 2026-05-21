@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EMTP 41種核心藥物發音與速記工具 v2</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: #dc3545;
+            margin-bottom: 5px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #6c757d;
+            margin-bottom: 30px;
+        }
+        h2 {
+            border-left: 5px solid #dc3545;
+            padding-left: 10px;
+            margin-top: 40px;
+            color: #212529;
+        }
+        /* 字卡佈局 */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 15px;
+            margin-bottom: 40px;
+        }
+        .card {
+            background-color: #ffb3b3;
+            border: 2px solid #ff9999;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.1s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+        }
+        .card:active {
+            transform: translateY(1px);
+            background-color: #ff9999;
+        }
+        .eng-name {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #111;
+            margin-bottom: 5px;
+            word-break: break-word;
+        }
+        .ch-name {
+            font-size: 0.9rem;
+            color: #444;
+            margin-bottom: 8px;
+        }
+        .phonetic {
+            font-size: 0.75rem;
+            color: #666;
+            background: rgba(255,255,255,0.5);
+            padding: 2px 6px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+        /* 表格樣式 */
+        .table-responsive {
+            overflow-x: auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+        th, td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        th {
+            background-color: #343a40;
+            color: white;
+        }
+        /* 表格內可點擊的發音欄位 */
+        .playable-td {
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .playable-td:hover {
+            background-color: #ffe6e6;
+        }
+        .playable-td strong {
+            color: #dc3545;
+            text-decoration: underline;
+        }
+        .badge {
+            background-color: #e9ecef;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+<div class="breath-sound-container">
+  <h3 class="section-title">🫁 EMTP 必考：5種異常呼吸音真實聽診複習</h3>
+  
+  <div class="sound-buttons">
+    <button class="sound-btn" onclick="playBreathSound('fine', this)">1. Fine Crackles 🔊</button>
+    <button class="sound-btn" onclick="playBreathSound('coarse', this)">2. Coarse Crackles 🔊</button>
+    <button class="sound-btn" onclick="playBreathSound('wheezing', this)">3. Wheezing 🔊</button>
+    <button class="sound-btn" onclick="playBreathSound('rhonchi', this)">4. Rhonchi 🔊</button>
+    <button class="sound-btn" onclick="playBreathSound('stridor', this)">5. Stridor 🔊</button>
+  </div>
+
+  <div id="sound-panel" class="sound-panel" style="display: none;">
+    <div class="panel-header">
+      <h4 id="sound-title">呼吸音名稱</h4>
+      <div class="audio-controls">
+        <span id="playing-status" style="font-size: 0.85rem; color: #d31027; font-weight: bold; margin-right: 10px; display:none;">🎵 音訊播放中...</span>
+        <button class="copy-btn" onclick="copySoundName()">📋 複製英文名稱</button>
+      </div>
+    </div>
+    
+    <div class="info-grid">
+      <div class="info-item"><strong>🔊 聲音性質：</strong> <span id="sound-nature">--</span></div>
+      <div class="info-item"><strong>🎯 常見聽診位置：</strong> <span id="sound-location">--</span></div>
+      <div class="info-item"><strong>🌬️ 吸吐氣期：</strong> <span id="sound-phase" class="badge">--</span></div>
+    </div>
+
+    <div class="clinical-box">
+      <strong>🏥 臨床鑑別診斷 (Differential Diagnosis)：</strong>
+      <p id="sound-ddx">--</p>
+    </div>
+  </div>
+</div>
+
+<audio id="audio-fine" src="https://www.easyauscultation.com/media/7d14db0b-e4f6-4fbf-939e-4e4fe62e08ec/rales-fine.mp3" preload="auto"></audio>
+<audio id="audio-coarse" src="https://www.easyauscultation.com/media/745fdf2f-8703-49d7-84da-508b9f67a21f/rales-coarse.mp3" preload="auto"></audio>
+<audio id="audio-wheezing" src="https://edge.sitecorecloud.io/mmanual-ssq1ci05/media/professional/sounds/wheezing.mp3?thn=0" preload="auto"></audio>
+<audio id="audio-rhonchi" src="https://www.easyauscultation.com/media/dfb10766-3d23-42e1-9505-1a1343714bda/rhonchi.mp3" preload="auto"></audio>
+<audio id="audio-stridor" src="http://www.rale.ca/media/stridor.wav" preload="auto"></audio>
+
+<style>
+  .breath-sound-container {
+    background: #f4f7f6;
+    border: 2px solid #3a6073;
+    border-radius: 12px;
+    padding: 15px;
+    margin: 10px auto;
+    max-width: 800px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  }
+  .section-title {
+    color: #2c3e50;
+    margin-top: 0;
+    margin-bottom: 12px;
+    font-size: 1.15rem;
+    border-bottom: 2px solid #3a6073;
+    padding-bottom: 5px;
+  }
+  .sound-buttons {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .sound-btn {
+    background: linear-gradient(135deg, #3a6073, #3a7bd5);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 12px 5px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.1s, opacity 0.2s;
+  }
+  .sound-btn:active {
+    transform: scale(0.95);
+  }
+  .sound-btn.active-btn {
+    background: linear-gradient(135deg, #d31027, #ea384d);
+    box-shadow: 0 0 8px rgba(211, 16, 39, 0.5);
+  }
+  .sound-panel {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    animation: fadeIn 0.3s ease-in-out;
+  }
+  .panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    border-bottom: 1px dashed #ccc;
+    padding-bottom: 5px;
+  }
+  #sound-title {
+    margin: 0;
+    color: #d31027;
+    font-size: 1.2rem;
+  }
+  .audio-controls {
+    display: flex;
+    align-items: center;
+  }
+  .copy-btn {
+    background: #e0e0e0;
+    border: none;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 0.8rem;
+    cursor: pointer;
+  }
+  .copy-btn:hover { background: #d5d5d5; }
+  .info-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+    margin-bottom: 12px;
+    font-size: 0.95rem;
+  }
+  @media(min-width: 600px) {
+    .info-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+  .badge {
+    background-color: #ffe6e6;
+    color: #c0392b;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: bold;
+  }
+  .clinical-box {
+    background: #fff9e6;
+    border-left: 4px solid #f39c12;
+    padding: 10px;
+    border-radius: 0 4px 4px 0;
+    font-size: 0.9rem;
+  }
+  .clinical-box p { margin: 5px 0 0 0; color: #555; }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+
+<script>
+  const soundData = {
+    fine: {
+      title: "1. Fine Crackles (細濕羅音 / 細爆裂音)",
+      nature: "短暫、不連續、高頻爆裂音。像「燒木柴」或耳邊「揉頭髮」的沙沙聲。",
+      location: "雙側肺底部 (Lung Bases) 最常見。",
+      phase: "吸氣期後半段 (Late Inspiration)。",
+      ddx: "肺炎早期、鬱血性心衰竭 (CHF) 肺容積超載、肺纖維化。"
+    },
+    coarse: {
+      title: "2. Coarse Crackles (粗濕羅音 / 粗爆裂音)",
+      nature: "不連續、低頻。比 Fine 更大聲、低沉，像「吸管喝飲料快喝完的泡泡破裂聲」。",
+      location: "全肺野皆可聽到（大氣道分泌物多時尤甚）。",
+      phase: "吸氣初期 (Early Inspiration) 及整個吐氣期。",
+      ddx: "慢性支氣管炎、支氣管擴張症、嚴重肺水腫 (Pulmonary Edema)、肺炎晚期。"
+    },
+    wheezing: {
+      title: "3. Wheezing (高頻喘鳴音 / 哮鳴音)",
+      nature: "連續性、高頻音樂性聲音。聽起來像「吹口哨」或「老鼠吱吱叫」，呼吸道狹窄產生。",
+      location: "全胸壁皆可聽診到。",
+      phase: "主要在吐氣期 (Expiratory)。嚴重時吸氣期也有。",
+      ddx: "氣喘 (Asthma) 急性發作、COPD 急性惡化、過敏性休克氣道水腫。"
+    },
+    rhonchi: {
+      title: "4. Rhonchi (低頻鼾音 / 乾囉音)",
+      nature: "連續性、低頻粗糙。聽起來像「打呼」或「呻吟」，主因大氣道有濃稠黏液阻礙。",
+      location: "中央大氣道、胸腔中央位置明顯。",
+      phase: "吸氣與吐氣皆有，以吐氣為主。咳嗽後聲音可能改變或暫時消失。",
+      ddx: "慢性支氣管炎、嚴重肺炎分泌物過多、局部氣道阻塞。"
+    },
+    stridor: {
+      title: "5. Stridor (吸氣期喉鳴音 / 喘鳴)",
+      nature: "🚨極高危！非常高頻響亮、尖銳。代表「上呼吸道（喉頭、氣管）」高度阻塞狹窄！",
+      location: "頸部、氣管處最響亮（嚴重時肉眼站在旁邊即可聽到）。",
+      phase: "主要在吸氣期 (Inspiratory)。",
+      ddx: "呼吸道異物哽塞 (FBAO)、會厭炎、過敏性喉頭水腫、Croup (哮吼)。"
+    }
+  };
+
+  let currentAudio = null;
+
+  function playBreathSound(type, btnElement) {
+    // 1. 先暫停目前正在播放的任何音訊
+    if (currentAudio) {
+      currentAudio.pause();
+      currentAudio.currentTime = 0;
+    }
+
+    // 2. 顯示面板並更新文字內容
+    document.getElementById('sound-panel').style.display = 'block';
+    document.getElementById('sound-title').innerText = soundData[type].title;
+    document.getElementById('sound-nature').innerText = soundData[type].nature;
+    document.getElementById('sound-location').innerText = soundData[type].location;
+    document.getElementById('sound-phase').innerText = soundData[type].phase;
+    document.getElementById('sound-ddx').innerText = soundData[type].ddx;
+    
+    // 3. 切換按鈕高亮樣式
+    const buttons = document.querySelectorAll('.sound-btn');
+    buttons.forEach(btn => btn.classList.remove('active-btn'));
+    btnElement.classList.add('active-btn');
+
+    // 4. 播放對應的真實音檔
+    const targetAudio = document.getElementById('audio-' + type);
+    const statusText = document.getElementById('playing-status');
+    
+    if (targetAudio) {
+      currentAudio = targetAudio;
+      statusText.style.display = 'inline';
+      
+      // 嘗試播放音訊
+      targetAudio.play().catch(err => {
+        console.log("音訊播放受阻:", err);
+        statusText.style.display = 'none';
+        
+      });
+
+      // 音訊結束時隱藏狀態
+      targetAudio.onended = function() {
+        statusText.style.display = 'none';
+      };
+    }
+  }
+
+  function copySoundName() {
+    const titleText = document.getElementById('sound-title').innerText;
+    const englishName = titleText.split(' (')[0].substring(3); 
+    
+    navigator.clipboard.writeText(englishName).then(() => {
+      alert('已複製：' + englishName);
+    }).catch(err => {
+      console.error('無法複製: ', err);
+    });
+  }
+</script>
+<div class="container">
+    <h1>EMTP 必備藥物發音字卡</h1>
+    <div class="subtitle">👨‍🚒 提示：不論是上半部字卡、或下半部表格的英文名稱，<b>點擊皆可直接發音</b></div>
+
+    <h2>第一部分：純發音專區（點擊即可發音）</h2>
+    <div class="grid-container" id="cardGrid"></div>
+
+    <h2>第二部分：機轉與急救適應症速記對照表（點擊英文欄位亦可發音）</h2>
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>藥物名稱 (英文/縮寫) 點擊發音</th>
+                    <th>中文名稱/分類</th>
+                    <th>EMTP 臨床主要適應症 / 機轉速記</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+// 41種藥物完整資料庫
+const drugs = [
+    { eng: "Epinephrine", ch: "腎上腺素", tip: "eh-pih-NEF-rin", note: "OHCA 一線用藥、嚴重過敏性休克、哮吼。" },
+    { eng: "Norepinephrine", ch: "正腎上腺素", tip: "nor-eh-pih-NEF-rin", note: "敗血性休克等低血容性以外的休克首選升壓劑。" },
+    { eng: "Dopamine", ch: "多巴胺", tip: "DOH-pah-meen", note: "因應心跳過慢導致的症狀性低血壓、第二線升壓劑。" },
+    { eng: "Dobutamine", ch: "強心多巴胺", tip: "doh-BYOO-tah-meen", note: "心因性休克（無嚴重低血壓時）用來加強心肌收縮。" },
+    { eng: "Vasopressin", ch: "血管加壓素", tip: "vay-zo-PRES-in", note: "抗利尿激素，強力血管收縮，部分OHCA流程可替代Epi。" },
+    { eng: "Aspirin", ch: "阿斯匹靈", tip: "AS-pih-rin", note: "ACS（急性冠心症）懷疑心肌梗塞，抗血小板凝集（300mg嚼服）。" },
+    { eng: "LMWH", ch: "低分子量肝素", tip: "L-M-W-H", note: "Low Molecular Weight Heparin，抗凝血，常用於ACS/肺栓塞治療。" },
+    { eng: "r-TPA", ch: "組織纖溶酶原激活劑", tip: "R-T-P-A", note: "Alteplase 腦中風/STEMI 溶栓用藥（須嚴格排除禁忌症）。" },
+    { eng: "NTG", ch: "硝化甘油", tip: "N-T-G", note: "Nitroglycerin 擴張冠狀動脈及靜脈，緩解心絞痛、急性肺水腫。" },
+    { eng: "Heparin", ch: "肝素", tip: "HEP-ah-rin", note: "抗凝血劑，防止血栓擴大，ACS後續治療常見。" },
+    { eng: "ACE Inhibitors", ch: "ACEI 類藥物", tip: "A-C-E-I", note: "血管收縮素轉化酶抑制劑，長期控制血壓、減少心臟重塑。" },
+    { eng: "P2Y12 Inhibitors", ch: "P2Y12 抑制劑", tip: "P-2-Y-12", note: "如 Clopidogrel (Plavix)，抗血小板，ACS常與Aspirin雙效合用。" },
+    { eng: "Tranexamic acid", ch: "斷血炎 (TXA)", tip: "tran-ex-AM-ik AS-id", note: "嚴重外傷出血、產後大出血，防纖維蛋白溶解（10分內給予）。" },
+    { eng: "Procainamide", ch: "普魯卡因胺", tip: "pro-KAY-nuh-mide", note: "穩定心律不整用藥（V-tach、預激綜合症伴房顫）。" },
+    { eng: "Lidocaine", ch: "利多卡因", tip: "LYE-doh-cayn", note: "Amiodarone的替代品，用於VF/VT；也是局部麻醉藥。" },
+    { eng: "Nifedipine", ch: "硝苯地平", tip: "nye-FED-ih-peen", note: "CCB類，降血壓、緩解心絞痛（現已不建議舌下微血管給藥）。" },
+    { eng: "Sodium nitroprusside", ch: "硝普鈉", tip: "SO-dee-um nye-tro-PRUSS-ide", note: "強力血管擴張劑，用於高血壓急症（Hypertensive crisis）。" },
+    { eng: "Atropine", ch: "阿托品", tip: "AH-tro-peen", note: "副交感神經阻斷劑，治療症狀性 Bradycardia（心跳過慢）、有機磷中毒。" },
+    { eng: "Beta-blockers", ch: "Beta 阻斷劑", tip: "BAY-tah BLOK-erz", note: "減慢心率、降低血壓、減少心肌耗氧量（如Metoprolol）。" },
+    { eng: "Amiodarone", ch: "胺碘酮 (臟能)", tip: "ah-mee-OH-duh-rone", note: "抗心律不整首選。OHCA (VF/pVT) 第一劑 300mg，第二劑 150mg。" },
+    { eng: "Adenosine", ch: "腺苷", tip: "ah-DEN-oh-seen", note: "治療 PSVT（陣發性上心室頻脈）。給藥要快（彈網），續接大管水。" },
+    { eng: "Calcium Channel Blockers", ch: "鈣離子阻斷劑 (CCB)", tip: "CAL-see-um CHAN-el", note: "控制心率（如Verapamil, Diltiazem用於AF/AFL伴快心室率）。" },
+    { eng: "Calcium chloride", ch: "氯化鈣", tip: "CAL-see-um KLOR-ide", note: "高血鉀、鈣離子阻斷劑中毒、高血鎂時的心臟保護劑。" },
+    { eng: "Calcium gluconate", ch: "葡萄糖酸鈣", tip: "CAL-see-um GLOO-co-nayt", note: "作用與氯化鈣同，但對周邊靜脈刺激性較小。" },
+    { eng: "Potassium Chloride", ch: "氯化鉀 (KCl)", tip: "poh-TAS-ee-um KLOR-ide", note: "補鉀用藥，嚴禁靜脈直接推注（IV Push），必死！須緩慢滴注。" },
+    { eng: "Glucagon", ch: "升糖素", tip: "GLOO-kuh-gon", note: "嚴重低血糖（無IV途徑時IM）、Beta阻斷劑或CCB中毒的解毒劑。" },
+    { eng: "Digoxin", ch: "毛地黃", tip: "dih-JOX-in", note: "加強心收縮、減慢心率，常用於心衰竭與心房顫動控制。" },
+    { eng: "Benzodiazepines", ch: "BZD 類鎮靜劑", tip: "ben-zo-die-AZ-eh-peen", note: "如 Midazolam, Diazepam。抗癲癇重積狀態、插管前鎮靜、抗焦慮。" },
+    { eng: "Flumazenil", ch: "氟馬西尼", tip: "floo-MAZ-eh-nil", note: "BZD 類藥物的特異性解毒劑（注意可能誘發長期癲癇患者大發作）。" },
+    { eng: "Atrovent", ch: "愛喘樂 (Ipratropium)", tip: "AT-roh-vent", note: "抗膽鹼支氣管擴張劑，急性氣喘/COPD常與Albuterol合用。" },
+    { eng: "Albuterol", ch: "速效支氣管擴張劑", tip: "al-BYOO-ter-ol", note: "Beta-2 刺激劑，緩解急性氣喘、COPD引起的支氣管痙攣。" },
+    { eng: "Mannitol", ch: "甘露醇", tip: "MAN-ih-tol", note: "滲透性利尿劑，用於降低腦創傷病患的腦內壓 (IICP)。" },
+    { eng: "Naloxone", ch: "納洛酮", tip: "nah-LOX-ohn", note: "鴉片類藥物（Morphine/Fentanyl/海洛因）過量、呼吸抑制的解毒劑。" },
+    { eng: "Fentanyl", ch: "芬太尼", tip: "FEN-tah-nil", note: "強力鴉片類止痛劑，效果是Morphine的100倍，血壓影響較小。" },
+    { eng: "Morphine", ch: "嗎啡", tip: "MOR-feen", note: "鴉片類止痛劑，用於嚴重創傷痛、ACS心絞痛（降低前負荷）。" },
+    { eng: "Etomidate", ch: "乙妥咪酯", tip: "eh-TOM-ih-dayt", note: "DA-RSI 誘導鎮靜首選，對血壓影響極小，心血管功能穩定。" },
+    { eng: "Propofol", ch: "丙泊酚 (牛奶針)", tip: "PRO-poh-fol", note: "快速短效麻醉劑，常用於維持麻醉或鎮靜，但容易造成血壓下降。" },
+    { eng: "Ketamine", ch: "K他命 / 凱他敏", tip: "KEE-tah-meen", note: "分離性麻醉劑，具支氣管擴張效果，適合氣喘或低血壓病患插管。" },
+    { eng: "Rocuronium", ch: "羅庫溴銨", tip: "row-kyur-OH-nee-um", note: "非去極化肌肉鬆弛劑（RSI插管用），維持時間較長（約30-60分）。" },
+    { eng: "Succinylcholine", ch: "琥珀膽鹼", tip: "suk-sin-il-KOH-leen", note: "去極化肌肉鬆弛劑，起效極快但注意高血鉀、惡性高熱禁忌症。" },
+    { eng: "Furosemide", ch: "拉西克斯 (Lasix)", tip: "fyoo-ROH-seh-mide", note: "強力利尿劑，用於急性肺水腫、充血性心衰竭以減輕心臟負擔。" },
+    { eng: "Sodium bicarbonate", ch: "碳酸氫鈉 (Jusom)", tip: "SO-dee-um bye-KAR-boh-nayt", note: "嚴重代謝性酸血症、高血鉀、三環抗憂鬱劑(TCA)中毒解毒。" }
+];
+
+const cardGrid = document.getElementById('cardGrid');
+const tableBody = document.getElementById('tableBody');
+
+drugs.forEach((drug) => {
+    // 1. 渲染字卡
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+        <div class="eng-name">${drug.eng}</div>
+        <div class="ch-name">${drug.ch}</div>
+        <div class="phonetic">📢 ${drug.tip}</div>
+    `;
+    card.addEventListener('click', () => { speakDrug(drug.eng); });
+    cardGrid.appendChild(card);
+
+    // 2. 渲染表格 (第一欄加上 playable-td 類別與點擊事件)
+    const row = document.createElement('tr');
+    
+    const nameTd = document.createElement('td');
+    nameTd.className = 'playable-td';
+    nameTd.innerHTML = `<strong>${drug.eng}</strong><br><small style="color:#666;">📢 ${drug.tip}</small>`;
+    nameTd.addEventListener('click', () => { speakDrug(drug.eng); });
+    
+    const chTd = document.createElement('td');
+    chTd.innerHTML = `<span class="badge">${drug.ch}</span>`;
+    
+    const noteTd = document.createElement('td');
+    noteTd.innerText = drug.note;
+    
+    row.appendChild(nameTd);
+    row.appendChild(chTd);
+    row.appendChild(noteTd);
+    tableBody.appendChild(row);
+});
+
+// 語音播放
+function speakDrug(text) {
+    if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'en-US';
+        utterance.rate = 0.85; // 稍微慢速放音
+        window.speechSynthesis.speak(utterance);
+    } else {
+        alert("您的裝置不支援語音播放。");
+    }
+}
+</script>
+
+</body>
+</html>
