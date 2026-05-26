@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EMTP 聽診與藥物萬用工具 v7.1</title>
+    <title>EMTP 聽診與藥物萬用工具 v9.0</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -27,7 +27,6 @@
             margin-bottom: 15px;
         }
         
-        /* 🎧 提示區塊 */
         .headphone-tip {
             text-align: center;
             font-size: 1.05rem;
@@ -49,7 +48,6 @@
             color: #212529;
         }
         
-        /* 🫁 🫀 聽診貨櫃樣式 */
         .auscultation-container {
             background: #ffffff;
             border: 2px solid #3a6073;
@@ -66,7 +64,6 @@
         }
         .heart-container .section-title { border-bottom-color: #b22222; }
         
-        /* 🖼️ 圖片貨櫃（防破圖隱藏邏輯） */
         .pic-box {
             text-align: center;
             margin-bottom: 20px;
@@ -79,7 +76,6 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
-        /* 心音分排群組標題 */
         .heart-group-title {
             font-size: 0.95rem;
             font-weight: bold;
@@ -102,42 +98,69 @@
         .sound-panel { background: #f8fafc; border: 1px solid #ddd; border-radius: 8px; padding: 15px; margin-top: 15px; }
         #sound-title, #heart-title { margin: 0 0 10px 0; color: #dc3545; font-size: 1.15rem; }
         
-        /* 🛑 停止播放所有聲音按鈕樣式 */
         .stop-all-btn {
             background: linear-gradient(135deg, #e74c3c, #c0392b); color: white; border: none; border-radius: 8px;
             padding: 14px 20px; font-size: 1.05rem; font-weight: bold; cursor: pointer; margin: 25px auto;
             display: block; width: 100%; max-width: 850px; box-shadow: 0 4px 6px rgba(0,0,0,0.15); text-align: center;
         }
 
-        /* 💊 依功能重組的臨床貨櫃樣式 */
+        /* 💊 藥物區塊樣式 */
         .drug-section {
             background: #ffffff; border-radius: 12px; padding: 18px; margin-bottom: 25px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-left: 8px solid #ccc;
         }
         .section-header { font-size: 1.25rem; font-weight: bold; margin-bottom: 15px; }
 
-        /* 藥物一體化卡片佈局 */
-        .drug-list-container { display: grid; grid-template-columns: 1fr; gap: 10px; }
-        @media(min-width: 768px) { .drug-list-container { grid-template-columns: repeat(2, 1fr); } }
+        .drug-list-container { display: flex; flex-direction: column; gap: 12px; }
         
+        /* 藥物卡片基礎外觀 */
         .drug-row-card {
             background: #fdfdfd; border: 1px solid #e2e8f0; border-radius: 8px;
-            display: flex; overflow: hidden; transition: box-shadow 0.1s;
+            display: flex; flex-direction: column; overflow: hidden; transition: box-shadow 0.1s;
         }
         .drug-row-card:hover { box-shadow: 0 4px 8px rgba(0,0,0,0.06); }
         
-        /* 左側可點擊發音按鈕區 */
+        /* 卡片上半部主控制列 */
+        .drug-main-row {
+            display: flex; width: 100%; align-items: stretch;
+        }
+        
+        /* 左側發音區 */
         .drug-trigger {
-            padding: 12px; width: 42%; min-width: 145px; display: flex; flex-direction: column;
+            padding: 14px; width: 35%; min-width: 145px; display: flex; flex-direction: column;
             justify-content: center; align-items: center; text-align: center; cursor: pointer;
             border-right: 1px dashed #cbd5e1; transition: background-color 0.1s;
         }
+        .drug-trigger:hover { filter: brightness(0.95); }
         .drug-eng { font-size: 1.05rem; font-weight: bold; color: #0f172a; word-break: break-word; line-height: 1.2; }
         .drug-ch { font-size: 0.88rem; color: #475569; margin-top: 4px; font-weight: 500; }
         .drug-speak-icon { font-size: 0.72rem; color: #94a3b8; margin-top: 5px; }
 
-        /* 右側臨床機轉說明區 */
-        .drug-info { padding: 12px; width: 58%; font-size: 0.9rem; color: #334155; display: flex; align-items: center; line-height: 1.45; background-color: #fff; }
+        /* 右側展開按鈕區 */
+        .drug-info-toggle { 
+            padding: 14px; width: 65%; font-size: 0.95rem; color: #334155; 
+            display: flex; justify-content: space-between; align-items: center; 
+            cursor: pointer; background-color: #fff; transition: background-color 0.1s;
+            font-weight: 500;
+        }
+        .drug-info-toggle:hover { background-color: #f8fafc; }
+        .toggle-arrow { font-size: 1.1rem; color: #64748b; transition: transform 0.2s; }
+
+        /* 📉 下半部：動態摺疊面板內容區 */
+        .drug-accordion-content {
+            display: none; /* 預先隱藏 */
+            background-color: #f8fafc;
+            border-top: 1px solid #e2e8f0;
+            padding: 15px;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+        
+        /* 摺疊面板內部的四項明細樣式 */
+        .detail-item { margin-bottom: 8px; }
+        .detail-item:last-child { margin-bottom: 0; }
+        .detail-label { font-weight: bold; color: #1e293b; display: inline-block; min-width: 140px; }
+        .detail-text { color: #334155; }
 
         .footer-credits {
             text-align: center; margin-top: 50px; padding: 25px; font-size: 0.9rem;
@@ -149,7 +172,7 @@
 
 <div class="container">
     <h1>EMTP 救護聽診與藥物萬用工具</h1>
-    <div class="subtitle">👨‍🚒 提示：肺音與心音再點一次可暫停。點擊藥品英文/中文區塊即可自動發音。</div>
+    <div class="subtitle">👨‍🚒 提示：肺音與心音再點一次可暫停。點擊藥名發音，點擊右側臨床說明區可「動態展開」完整四核心考點。</div>
     
     <div class="headphone-tip">🎧 提示：建議播放聽診音時使用耳機聆聽，效果更佳！（各聽診音檔皆內建 8 個循環對照）</div>
 
@@ -210,13 +233,13 @@
 
     <button class="stop-all-btn" onclick="stopAllSounds()">🛑 停止播放所有聲音 (藥物 + 聽診音檔)</button>
 
-    <h2>急救用藥與處置臨床整合大分群</h2>
+    <h2>EMTP 臨床藥物專區（按最新分類大綱分組）</h2>
     <div id="dynamicDrugSections"></div>
 
 </div>
 
 <div class="footer-credits">
-    本網頁之急救醫學音檔與臨床說明皆參考來源自網路。相關救護技術員指引，請以課本為準，本網站僅供 EMTP 救護技術員學術複習使用。若有發現錯誤或建議事項可聯絡設計者。
+    本網頁之急救醫學音檔與臨床說明皆精確對照學長提供之常見急救藥物講義內容。相關救護技術員指引，請以官方教材課本為準，本網站僅供 EMTP 技術複習學術使用。
 </div>
 
 <audio id="audio-fine" src="./mp3/fine_crackles.mp3" preload="auto"></audio>
@@ -233,12 +256,10 @@
 <audio id="audio-pfr" src="./mp3/pfr.mp3" preload="auto"></audio>
 
 <script>
-  // 圖片載入失敗時的隱藏邏輯防呆
   function hidePicBox(boxId) {
       document.getElementById(boxId).style.display = 'none';
   }
 
-  // 聽診資料庫
   const soundData = {
     fine: { title: "Fine Crackles (細濕羅音)", nature: "短暫不連續高頻爆裂音。像耳邊揉頭髮聲。", location: "較下面肺泡區、雙側肺底部。", ddx: "肺炎早期、鬱血性心衰竭 (CHF) 肺水腫早期。" },
     coarse: { title: "Coarse Crackles (粗濕羅音)", nature: "低頻粗糙。像吸管喝飲料快完時的泡泡破裂聲。", location: "接近中央主要支氣管區。", ddx: "慢性支氣管炎、嚴重肺水腫、分泌物過多。" },
@@ -275,148 +296,576 @@
 </script>
 
 <script>
-// 🎯 臨床藥物資料庫
+// 🎯 依據學弟最新指定之藥品分組、分類、考點進行結構化宣告
 const clinicalSections = [
     {
         category: "🟧 升壓劑", color: "#f97316", bg: "#fff7ed",
         list: [
-            { eng: "Epinephrine", ch: "腎上腺素", note: "OHCA一線用藥、嚴重過敏性休克、增加外周阻力與強心。" },
-            { eng: "Norepinephrine", ch: "正腎上腺素", note: "敗血性休克等低血容以外休克的首選升壓劑。" },
-            { eng: "Dopamine", ch: "多巴胺", note: "因應心跳過慢導致的症狀性低血壓、第二線升壓劑。" },
-            { eng: "Dobutamine", ch: "強心多巴胺", note: "心因性休克（無嚴重低血壓時）用來加強心肌收縮。" },
-            { eng: "Vasopressine", ch: "血管加壓素", note: "強力周邊血管收縮，部分OHCA流程可替代Epi。" }
+            { 
+                eng: "Epinephrine", ch: "腎上腺素 (Bosmin)", summary: "OHCA一線、過敏性休克、重度緩脈",
+                moa: "1.使週邊血管收縮，增加冠狀動脈之血液灌流(β1=β2>α)。小劑量：β1→增加心收縮力和心跳；β2→氣管擴張。治療劑量：α1→收縮血管。2.強力的β2致效劑。",
+                ind: "1.心跳停止，如VF、無脈性VT、無收縮、無脈搏電氣活動(PEA)。2.有症狀之緩脈，可用於Atropine、Dopamine及TCP無效時(IV drip)。3.嚴重低血壓(IV drip)。4.過敏性休克，嚴重之過敏反應，可合併使用大量輸液、類固醇和抗組織胺。",
+                dose: "1.心跳停止：靜脈注射：急救時每3-5分鐘IV注射1mg。可以2~2.5 mg稀釋於10ml N/S氣管內給藥。2.重度緩脈合併低血壓：2~10µg/min (將1mg 1:1000溶液加至500ml N/S，以每分鐘1~5毫升速度持續滴注)。",
+                contra: "1.提高血壓和增快心跳可能導致心肌缺血、心絞痛並提高心肌之耗氧量。2.高劑量不能增加存活率或改善神經系統之預後，反而可能造成急救後心肌功能不全。3.毒藥物中毒引發之休克可能需要較高之劑量。"
+            },
+            { 
+                eng: "Norepinephrine", ch: "正腎上腺素", summary: "嚴重心因性/敗血性休克、最後一線",
+                moa: "1.β1 & α >> β2。α1→收縮周邊小動脈以升血壓→會增加迷走神經活性→雖有β1效果但不太增加心跳。2.讓腎臟、腸繫膜的血管收縮。",
+                ind: "1.嚴重心因性休克、敗血性休克。2.血行動力明顯不穩的低血壓(SBP<70 mmHg)。3.週邊血管阻力低下(Dopamine無效後使用可能有效)。4.所有缺血性心臟病合併休克治療方式中最後一線的藥物。",
+                dose: "靜脈滴注(唯一路徑)：1.一般劑量：0.5~1.0 µg/min。2.可調整至改善血壓或最大量30µg/kg/min。",
+                contra: "1.橫紋肌或鹼性溶液同一條輸液管路。2.毒藥物引起的低血壓，可能需要較大的劑量。3.提高心率和血壓會增加心肌的氧氣需求量而導致心率不整(急性缺血的病人要小心)。4.漏針時會導致周圍組織壞死。5.萬一漏針可在周圍施打5~10mg的phentolamine溶於10~15ml的N/S。"
+            },
+            { 
+                eng: "Dopamine", ch: "多巴胺", summary: "症狀性心搏過慢第二線、休克低血壓",
+                moa: "1.正腎上腺素前驅物，類似兒茶酚胺的物質。2.可以刺激α和β與自己的受體：D1：腎臟&腸繫膜血管；D2：中樞神經。",
+                ind: "1.收縮壓70~100mmHg有休克症狀之低血壓。2.有症狀之心搏過慢，於atropine後之第二線用藥。",
+                dose: "1.藥理學劑量：低劑量(D1):1~5 µg/kg/min(增加腎臟灌流)；中劑量(β1):5-10 µg/kg/min (增強心臟收縮力)；高劑量(α1):10-20 µg/kg/min(造成周邊血管收縮→減少腎臟灌流)。連續滴注：視病人反應調整。2.臨床使用：SBP 70-100 mmHg合併休克症狀 5~15 µg/kg/min；合併低血壓有症狀之心搏過慢 5~20 µg/kg/min。",
+                contra: "1.低血容病人應先補充體液。2.伴隨鬱血性心臟病衰竭的心因性休克時，應小心適用。3.可能造成頻脈或血管過度收縮。4.勿與鹼性溶液(sodium bicarbonate)同一條輸液管路。"
+            },
+            { 
+                eng: "Dobutamine", ch: "強心多巴胺", summary: "鬱血性心衰竭、無休克徵象之肺水腫",
+                moa: "1.合成的兒茶酚胺。β1：心臟收縮；β2：血管放鬆；α1：血管收縮。β2與α1相互抵銷，β2強一點(血壓稍降)。",
+                ind: "鬱血性心臟衰竭或肺水腫，且沒有休克徵象。",
+                dose: "1.靜脈滴注：2~20 µg/kg/min。2.視心跳速率調整，勿使心跳速率增加超20%。",
+                contra: "1.若低血壓且有休克徵象時，避免使用。2.可能會造成頻脈、血壓不穩、頭痛、噁心。3.懷疑或已知毒藥物引起之休克，不可使用(因容易加重心律不整的危險性)。4.勿與鹼性溶液同一條輸液管路。"
+            },
+            { 
+                eng: "Vasopressin", ch: "血管加壓素 / Pitressin", summary: "抗利尿激素、休克增加灌流",
+                moa: "1.又稱ADH(抗利尿激素)促進腎小管水分再吸收，也使血管平滑肌收縮增加冠狀動脈灌流。",
+                ind: "血管擴張性休克(如敗血性休克)。",
+                dose: "心跳停止時以40U靜脈注射一劑即可(靜脈、骨內注射或氣管內給藥)。",
+                contra: "1.增加周邊血管阻力。2.可導致心肌缺氧及心絞痛。3.不建議用於有冠狀動脈心臟病之病人。"
+            }
         ]
     },
     {
         category: "🟨 心搏過緩", color: "#eab308", bg: "#fefce8",
         list: [
-            { eng: "Atropine", ch: "阿托品", note: "副交感神經阻斷劑，治療症狀性心搏過緩的首選藥物。" },
-            { eng: "Epinephrine", ch: "腎上腺素", note: "持續輸注：用於Atropine無效時的症狀性心搏過緩。" },
-            { eng: "Dopamine", ch: "多巴胺", note: "持續輸注：用於Atropine無效、血壓低迷的心搏過緩。" },
-            { eng: "Glucagon", ch: "昇糖素", note: "特異解毒劑：Beta阻斷劑或鈣離子阻斷劑中毒導致的心搏過緩。" }
+            { 
+                eng: "Atropine", ch: "阿托平", summary: "有症狀竇性緩脈首選、副交感抑制劑",
+                moa: "1.抗蕈毒鹼藥物，為副交感神經抑制劑。2.急計時主要：加速心室或心房的節律及增加房室傳導。",
+                ind: "1.有症狀之竇性緩脈之首選。2.房室節阻斷(1度或2度1型 AV block)。房室節以下阻斷(2度2型或3度AV block可能無效)。3.有機磷中毒、神經毒氣。",
+                dose: "1.緩脈：0.5 mg IV，需要時每3~5分鐘得重複給藥，最大劑量3mg，劑量及給藥間隔視病患症狀之嚴重度調整。2.氣管內給藥：2~3mg以N/S釋至10ml。",
+                contra: "1.心肌缺血或缺氧時使用應特別小心，因會增加心肌之氧氣需求。2.避免用於低體溫造成之心搏過慢。3.無效：使用於2度2型或新發生之3度AV block併寬QRS波形、換心病患。4.低劑量(<0.1mg)可能導致心率過慢。5.特殊情況下可能需要比建議還高的量(有機磷中毒)。6.ACLS 2010已不建議使用於心跳停止、無脈搏電氣活動(PEA)。"
+            },
+            { 
+                eng: "Epinephrine", ch: "腎上腺素 (Bosmin)", summary: "用於Atropine無效時之緩脈合併低血壓持續滴注",
+                moa: "使週邊血管收縮，增加冠狀動脈之血液灌流(β1=β2>α)。小劑量：β1→增加心收縮力和心跳；β2→氣管擴張。",
+                ind: "有症狀之緩脈，可用於Atropine、Dopamine及TCP無效時(IV drip)。",
+                dose: "重度緩脈合併低血壓：2~10µg/min (將1mg 1:1000溶液加至500ml N/S，以每分鐘1~5毫升速度持續滴注)。",
+                contra: "提高血壓和增快心跳可能導致心肌缺血、心絞痛並提高心肌之耗氧量。"
+            },
+            { 
+                eng: "Dopamine", ch: "多巴胺", summary: "有症狀之心搏過慢第二線用藥",
+                moa: "正腎上腺素前驅物，可以刺激α和β與自己的受體。",
+                ind: "有症狀之心搏過慢，於atropine後之第二線用藥。",
+                dose: "合併低血壓有症狀之心搏過慢 5~20 µg/kg/min 連續滴注。",
+                contra: "可能造成頻脈或血管過度收縮。勿與鹼性溶液同一條輸液管路。"
+            },
+            { 
+                eng: "Glucagon", ch: "昇糖素", summary: "CCB/BB過量中毒特異解毒劑",
+                moa: "1.是由胰臟胰島細胞分泌的激素促進肝醣分解。2.增加心搏速度，但對血壓無影響。",
+                ind: "鈣離子阻斷劑或乙型阻斷劑過量中毒。",
+                dose: "靜脈滴注 1~5 mg 超過2~5分鐘。",
+                contra: "1.勿與生理食鹽水混合。2.可能引起嘔吐、高血糖。"
+            }
         ]
     },
     {
-        category: "🟥 心律不整 — 心臟電位", color: "#ef4444", bg: "#fef2f2",
+        category: "🟥 心律不整 - 心臟電位", color: "#ef4444", bg: "#fef2f2",
         list: [
-            { eng: "Procainamide", ch: "普魯卡因胺", note: "Class Ia 抗心律不整藥，穩定心室頻脈、預激綜合症伴房顫。" },
-            { eng: "Lidocaine", ch: "利多卡因", note: "Class Ib 抗心律不整藥，Amiodarone的替代品，用於VF/pVT。" },
-            { eng: "β-blockers", ch: "Beta 阻斷劑", note: "減慢心率、降低血壓、減少心肌耗氧量（如 Metoprolol）。" },
-            { eng: "Amiodaron", ch: "胺碘酮 (臟能)", note: "抗心律不整首選。OHCA (VF/VT) 第一劑 300mg，第二劑 150mg。" },
-            { eng: "CCB", ch: "鈣離子阻斷劑", note: "控制心率（如 Verapamil, Diltiazem 用於房顫伴快速心室率）。" }
+            { 
+                eng: "Procainamide", ch: "普魯卡因胺", summary: "Class Ia 鈉阻斷劑、壓抑心房心室異位心律",
+                moa: "Class Ia-鈉離子通道阻斷劑。減緩心肌組織之傳導來壓抑心房和心室的心律不整。",
+                ind: "1.適用於多種心律不整。2.PSVT對 adenosine 及迷走神經刺激無效且血壓穩定時。3.穩定的不明病灶寬QRS波頻脈。4.WPW 症候群併發Af且心率過快。",
+                dose: "1.復發 VT/VF: 20mg/min滴注，緊急情況下，可給予50mg/min 最大劑量皆為17 mg/kg。2.其他情況：20 mg/min 靜脈滴注至出現下列情形：(1)心律不整被抑制 (2)低血壓 (3)QRS波寬度延長50% (4)總累積劑量達到 17 mg/kg。3.維持滴注：1-4 mg/min。",
+                contra: "1.若心臟和腎功能不良，需調降總劑量至12mg/kg以及維持劑量1~2mg/min。2.可引發心律不整，尤其在急性心肌梗塞、低血鉀或低血鎂時。3.左心室功能不良的病人可能引起低血壓。4.和其他會延長 QT間隔的藥物合併使用要小心。5.Torsades de pointes時不可使用。6.不可與 Amiodarone 併用。"
+            },
+            { 
+                eng: "Lidocaine", ch: "利多卡因 (Xylocaine)", summary: "Class Ib 鈉阻斷劑、心室心律不整替代藥物",
+                moa: "Class Ib-鈉離子通道阻斷劑。",
+                ind: "1.無脈性 VT/VF。2.穩定的單型性 VT。3.穩定的多型性 VT。4.心室心律不整的第二線用藥。5.穩定之心室頻脈/不明來源之寬 QRS波頻脈。",
+                dose: "1.無脈性心室頻脈/心室顫動：初始劑量：1.0~1.5 mg/kg 靜注。無效時可每5~10分鐘追加0.5~0.75 mg/kg靜注，最大劑量3 mg/kg。氣管內給藥 2-4 mg/kg。2.穩定之心室頻脈/不明來源之寬 QRS波頻脈：靜注初始劑量：1.0~1.5mg/kg，無效時可每5~10分鐘追加0.5~0.75 mg/kg靜注。最大劑量：3 mg/kg。維持劑量：2~4 mg/min (30~50 µg/kg/min)。",
+                contra: "1.不建議於心肌梗塞時作預防性使用。2.肝功能或左心室功能不良之病人要調降維持劑量(非負荷劑量)(尤其心臟功能不佳時)。3.已有毒性徵象出現時宜立刻停藥。"
+            },
+            { 
+                eng: "β-blockers", ch: "乙型阻斷劑 (Metoprolol/Atenolol/Propranolol)", summary: "Class II、降低心率血壓、控制心室反應速率",
+                moa: "1.Class II。2.可減少循環中兒茶酚胺的作用和降低心率和血壓。",
+                ind: "1.高血壓治療。2.急性心肌梗塞後使用可改善存活。3.A-Fib/Af或SVT(JT、PSVT、AT)可降低心室反應速率或回復正常竇性心律。4.心衰竭。",
+                dose: "1.Metoprolol: 5mg 緩慢靜注，每5分鐘一次，最大劑量 15 mg。口服第一天 50mg BID，增加到 100mg BID。\n2.Atenolol: 5mg 緩慢靜注(超過5分鐘)，10分鐘後再給5mg緩慢靜注(超過5分鐘)。口服第一天 50mg，增加至50 mg BID。\n3.Propranolol (Inderal): 0.1 mg/kg 緩慢靜注，可分為三次等劑量，間隔2~3分鐘注射，注射速率勿超過1 mg/min。\n4.Esmolol: 0.5 mg/kg 注射超過1分鐘，接著以 0.05 mg/kg/min 持續注射，得調整劑量至最大劑量 0.3 mg/kg/min(半生期僅2-9分鐘)。\n5.Labetalol (Trandate): 10 mg 靜脈推注超過1~2分鐘，得每10分鐘重複或加倍給予至最大劑量150mg，或以 2~8 mg/min 靜脈滴注。",
+                contra: "1.避免用於支氣管痙攣(Asthma)、重度心臟傳導障礙(AV Block)及心臟衰竭(CHF)之病人。2.靜脈注射時，若與鈣離子阻斷劑併用會造成嚴重低血壓。3.禁止用於HR<60/min, SBP<100mmHg, 嚴重左心衰竭, 低組織灌流, 2度或3度 AV block 患者。4.禁止 WPW 症候群合併Af時，用以控制心室速率。"
+            },
+            { 
+                eng: "Amiodaron", ch: "胺碘酮 / 臟得樂 (Cordarone)", summary: "Class III、VF/VT電擊無效一線主力",
+                moa: "1.Class III-鉀離子通道阻斷劑。2.對鈉、鉀、鈣通道有反應，也阻斷α和β(降低血壓、心收縮力)。3.目前最常用，幾乎通殺。",
+                ind: "1.電擊無效之無脈搏VT/VF。2.多型性VT和不明來源的寬波頻脈。3.作為SVT或PSVT電擊時之輔助。4.左心室功能完整時，用於終止異位性或多發性心房頻脈。5.當其他治療無效時，用於控制Af/AF的速率。6.血行動力穩定之VT，尤其左心功能不良時。",
+                dose: "1.心臟停止：(1)300 mg 靜脈注射。(2)如初始劑量無效或為復發之VT/VF，可考慮每3~5分鐘重複給予 150mg 之劑量。(3)最大累積劑量 2.2 g/24 Hr。2.穩定之寬QRS波頻脈：最大累積劑量 2.2g/24 Hr。(1)快速注射：150mg 在前10分鐘滴注(15mg/min)，可重複每10分鐘快速注射150 mg。(2)慢速滴注：360 mg 在6小時內給予(1mg/min)。(3)維持滴注：540mg 在18小時內給予(0.5mg/min)。",
+                contra: "1.可能引致血管擴張及血壓下降(尤其靜脈注射時)。2.可能有降低心臟收縮力之作用(尤其靜脈注射時)。3.當累積量>2.2g/24 Hr時，可引致顯著之低血壓。4.可能延長QT間隔，不應與其他會延長QT間隔之藥物(例procainamide)併用。5.Torsades de pointes時不可使用。6.可藉由減緩滴注速率來預防低血壓和心搏過緩。"
+            },
+            { 
+                eng: "CCB", ch: "鈣離子阻斷劑 (Diltiazem/Verapamil)", summary: "Class IV、減緩房室結傳導、控制心房頻脈心室速率",
+                moa: "1.Class IV-CCB。可減緩AV node的傳導，有效終止迴旋性心律不整，和控制各種心房性頻脈的心室反應速率。",
+                ind: "1.Af/AF 時控制心室速率。2.PSVT 對於 Adenosine 無反應，且血壓正常。",
+                dose: "1.Diltiazem: 15-20 mg (0.25mg/kg) IV超過2分鐘。15分鐘後可再注射 20~25mg (0.35 mg/kg) IV 超過2分鐘。維持滴注：5~15 mg/hr。\n2.Verapamil: 2.5~5.0 mg 靜脈注射超過2分鐘，視需要在15~30分鐘內給予5~10mg，最大劑量 20 mg。",
+                contra: "1.病灶不明的寬 QRS 頻脈或毒藥物引發之頻脈時，勿使用。2.WPW 症候群併發 Af/AF時，或有病竇症候群(SSS)，或有房室傳導阻斷未裝置節律器時，不可使用。3.同時使用鈣離子阻斷劑與乙型阻斷劑會造成嚴重低血壓。"
+            }
         ]
     },
     {
-        category: "🟩 心律不整 — 離子補充 / 強心 / 特定專精", color: "#22c55e", bg: "#f0fdf4",
+        category: "💖 心律不整 - 離子補充", color: "#f43f5e", bg: "#fff1f2",
         list: [
-            { eng: "MgSO4", ch: "硫酸鎂", note: "離子補充：治療尖端扭轉型心室頻脈 (Torsades de Pointes) 首選。" },
-            { eng: "Calcium chloride", ch: "氯化鈣", note: "離子補充：高血鉀、鈣解離阻斷劑中毒時的心臟保護劑。" },
-            { eng: "Calcium gluconate", ch: "葡萄糖酸鈣", note: "離子補充：高血鉀保護心肌，周邊靜脈刺激性較氯化鈣小。" },
-            { eng: "KCl", ch: "氯化鉀", note: "離子補充：低血鉀補鉀。⚠️嚴禁靜脈直接推注(IV Push)，必須緩慢滴注。" },
-            { eng: "Digoxin", ch: "毛地黃", note: "強心：加強心肌收縮、減慢房室傳導，常用於心衰竭控制。" },
-            { eng: "Adenosine", ch: "腺苷", note: "特定心律專精：治療陣發性上心室頻脈 (PSVT) 轉律首選。" }
+            { 
+                eng: "MgSO4", ch: "硫酸鎂", summary: "穩定細胞膜、Torsades de pointes首選",
+                moa: "補充鎂離子，鎂是鈉、鉀、鈣的轉運出入細胞機制所必須的，也是穩定細胞膜的重要離子。",
+                ind: "1.只建議於Torsades de pointes 或低血鎂症引起之心跳停止。2.頑固性 VF(尤其已知有低血鎂之情形時)。3.有脈搏之 Torsades de pointes。4.因毛地黃中毒造成有生命危險之心室心律不整。",
+                dose: "1.心跳停止(低血鎂症或 Torsades de pointes)：1~2g稀釋於10ml之D5W靜脈注射。2.Torsades de pointes(有脈搏)：初始劑量：1~2g加入50~100ml D5W 靜脈滴注5~60分鐘；維持劑量：0.5~1g/Hr靜脈滴注。",
+                contra: "1.快速注射會引致低血壓。2.腎功能衰竭病人使用要小心。"
+            },
+            { 
+                eng: "Calcium chloride", ch: "氯化鈣", summary: "補充鈣離子、高血鉀/低血鈣特異治療",
+                moa: "主要為補充鈣離子。",
+                ind: "1.已知或懷疑高血鉀症時(如腎衰竭)。2.低血鈣(如大量輸血後)。3.鈣離子阻斷劑或乙型阻斷劑過量中毒時。4.在鈣離子阻斷劑作靜脈注射前可先給予，以預防低血壓。",
+                dose: "用於治療高血鉀或鈣離子阻斷劑過量→ 8-16 mg/kg (10%針劑通常5~10mL)；用於預防鈣離子阻斷劑引起之低血壓→ 2-4 mg/kg。",
+                contra: "1.毛地黃中毒所引起之高血鉀時不可使用。2.心跳停止時勿作例行性使用。3.勿與碳酸氫鈉溶液混合。4.對靜脈有刺激性，外滲時會造成局部組織壞死。5.快速輸注可能造成致命性的心跳停止。"
+            },
+            { 
+                eng: "Calcium gluconate", ch: "葡萄糖酸鈣", summary: "補充鈣離子、對靜脈刺激性較氯化鈣小",
+                moa: "補充鈣離子，與氯化鈣作用相同，但其游離鈣較少，對周邊組織與靜脈的刺激性較小。",
+                ind: "已知或懷疑高血鉀症、低血鈣、CCB或BB中毒。",
+                dose: "1 mEq/kg IV，每10分鐘給予0.5 mEq/kg。",
+                contra: "毛地黃中毒所引起之高血鉀時不可使用。勿與碳酸氫鈉溶液混合。"
+            },
+            { 
+                eng: "KCl", ch: "氯化鉀", summary: "補充鉀離子",
+                moa: "（待補充...）",
+                ind: "（待補充...）",
+                dose: "（待補充...）",
+                contra: "（待補充...）"
+            }
         ]
     },
     {
-        category: "🟦 心肌梗塞 (ACS) 全系列處置", color: "#3b82f6", bg: "#eff6ff",
+        category: "🤎 心律不整 - 強心", color: "#a16207", bg: "#fef9c3",
         list: [
-            { eng: "Aspirin", ch: "阿斯匹靈", note: "抗血小板：懷疑急性心肌梗塞立刻嚼服 160-325mg 阻止血栓。" },
-            { eng: "P2Y12抑制劑", ch: "P2Y12 抑制劑", note: "抗血小板：如 Clopidogrel (Plavix)，常與Aspirin雙效合用。" },
-            { eng: "Heparin", ch: "肝素", note: "抗血栓：抗凝血劑，防止纖維蛋白血栓擴大與血管再阻塞。" },
-            { eng: "LMHW", ch: "低分子量肝素", note: "抗血栓：Low Molecular Weight Heparin，抗凝血效果好且穩定。" },
-            { eng: "RTPA", ch: "血栓溶解劑", note: "血栓溶解：Alteplase 超急性腦中風、STEMI 黃金期內溶栓用藥。" },
-            { eng: "NTG", ch: "硝化甘油", note: "血管舒張：擴張冠狀動脈，緩解心絞痛、降低前負荷緩解肺水腫。" },
-            { eng: "Morphine", ch: "嗎啡", note: "血管舒張：強力止痛，擴張小靜脈，降低前負荷與焦慮反射。" },
-            { eng: "ACEI", ch: "血管收縮素轉化酶抑制劑", note: "血管舒張：控制血壓，減少梗塞後的心臟重塑惡化。" },
-            { eng: "Nifedipine", ch: "硝苯地平", note: "血管舒張：CCB類擴張血管，現已嚴禁舌下微血管給藥。" },
-            { eng: "Sodium nitroprusside", ch: "硝普鈉", note: "血管舒張：強力動靜脈血管擴張劑，用於高血壓急症重症處置。" }
+            { 
+                eng: "Digoxin", ch: "強心配醣體 / 毛地黃", summary: "增強心肌收縮力、控制房顫心室反應速率",
+                moa: "1.強心作用：抑制鈉-鉀ATP，限制鈉離子外移，最終增加細胞內鈣離子而讓心肌收縮力增加。2.降低HR：提高迷走神經活性，抑制 SA node 的自主性及延長 AV node 的傳導時間。3.利尿作用：增加心輸出，改善腎臟血流。",
+                ind: "1.減緩 Af/AF之心室反應速率。2.PSVT病患心臟衰竭時治療之替代藥物。",
+                dose: "1.初始劑量 10~15 µg/kg 靜脈注射。2.維持劑量視體重及腎功能好壞而定。",
+                contra: "1.治療濃度範圍小(0.8~2.0ng/mL)故常見中毒。2.除非危及生命，否則使用毛地黃之病人宜避免電擊。3.禁止 WPW 症候群合併Af時，用以控制心室速率。4.低血鉀狀況下更容易產生心律不整。"
+            }
         ]
     },
     {
-        category: "🟪 中樞神經系列", color: "#a855f7", bg: "#faf5ff",
+        category: "💜 心律不整 - 特定心律專精", color: "#7c3aed", bg: "#f5f3ff",
         list: [
-            { eng: "BZD類", ch: "BZD 類鎮靜劑", note: "鎮靜、抗癲癇：如 Midazolam, Diazepam，抗癲癇重積狀態與鎮靜。" },
-            { eng: "Flumazenil", ch: "氟馬西尼", note: "拮抗解毒：BZD類特異性解毒劑（注意可能誘發癲癇大發作）。" },
-            { eng: "MgSO4", ch: "硫酸鎂", note: "子癲症：妊娠毒血症伴隨抽搐（子癲症）預防與解痙的首選藥物。" }
+            { 
+                eng: "Adenosine", ch: "腺苷酸 (Adenocor)", summary: "PSVT轉律首選、雙槍打法快速注射",
+                moa: "1.短暫抑制 AV node 和 SA node 的傳傳導。2.特色：藥品半衰期非常短，作用時間很短(<10秒)、病人會有被「電」到的感覺。",
+                ind: "1.窄 QRS 頻脈之區分診斷：藥物作用後，若為PSVT→成一直線；若為2:1的AF→呈鋸齒狀。2.同時即可治療PSVT。",
+                dose: "必須快速注射(雙槍打法)：1.起始劑量6mg於1~3秒內快速靜脈注射，緊接著以20ml生理食鹽水快速沖注，同時將手臂抬高。2.第二次劑量：得於1~2分鐘內再給予12mg。3.第三次劑量：於1~2分鐘內再給予12 mg。",
+                contra: "1.會出現短暫性的潮紅、胸悶、胸痛、心跳停止、心搏過緩。2.服用茶鹼之病人較無效。3.避免用於服用 dipyridamole 之病患。4.使用於VT時病患可能會惡化。5.禁用於毒、藥物引起之心搏過速。"
+            }
         ]
     },
     {
-        category: "🩵 支氣管擴張劑 & 利尿劑", color: "#06b6d4", bg: "#ecfeff",
+        category: "💙 心肌梗塞 - 抗血小板 / 抗血栓 / 血栓溶解", color: "#2563eb", bg: "#eff6ff",
         list: [
-            { eng: "Atrovent", ch: "愛喘樂", note: "支氣管擴張劑：抗膽鹼吸入劑，常與Albuterol合併使用。" },
-            { eng: "Albuterol", ch: "速效支氣管擴張劑", note: "支氣管擴張劑：Beta-2 刺激劑，緩解急性氣喘及COPD支氣管痙攣。" },
-            { eng: "Furosemide", ch: "拉西克斯 (Lasix)", note: "利尿劑：強力袢利尿劑，用於急性肺水腫、充血性心衰竭。" },
-            { eng: "Mannitol", ch: "甘露醇", note: "利尿劑：滲透性利尿劑，用來降低腦創傷病患的顱內壓 (IICP)。" }
+            { 
+                eng: "Aspirin", ch: "阿斯匹靈", summary: "不可逆抗血小板、ACS嚼服首選",
+                moa: "1.消炎、解熱、止痛藥。2.抑制血小板的能力(造成不可逆的血小板凝集抑制)，因而降低整體急性心肌梗塞之死亡率、再梗塞率及非致死性中風發生率。",
+                ind: "1.任何急性冠心症(ACS)病人。2.任何心肌缺氧症狀之病人。",
+                dose: "口服：160~325mg 儘快嚼碎吞服。無法口服者按直腸給藥。",
+                contra: "1.急性潰瘍及氣喘為相對禁忌症。2.對 aspirin 過敏為絕對禁忌症。"
+            },
+            { 
+                eng: "P2Y12抑制劑", ch: "保栓通/百憂解類抗血小板藥 (如 Clopidogrel/Ticagrelor)", summary: "（講義未列詳細急救表格）",
+                moa: "（待補充...）",
+                ind: "（待補充...）",
+                dose: "（待補充...）",
+                contra: "（待補充...）"
+            },
+            { 
+                eng: "Heparin", ch: "肝素 (UFH)", summary: "輔助心肌梗塞、抗凝血反應",
+                moa: "使凝血因子失去活性，間接引發快速的抗凝血反應。",
+                ind: "1.急性心肌梗塞之輔助治療。2.與血栓溶解劑合併使用。",
+                dose: "1.初始劑量：60 U/kg(最多4,000U)。2.維持劑量：12 U/kg/Hr(最多1,000U/Hr)，調整劑量以維持aPTT為正常之1.5~2.0倍。",
+                contra: "1.與血栓溶解劑之禁忌症相同。2.解毒劑：protamine。3.必須IV。4.會刺激血小板活化，造成血小板數目低下。5.需常常抽血監測aPTT。"
+            },
+            { 
+                eng: "LMHW", ch: "低分子量肝素 (Enoxaparin/Dalteparin)", summary: "急性冠心症皮下抗凝血處置",
+                moa: "使凝血因子失去活性(作用小)，可IV也可SC，學理上比肝素較安全也比較方便。",
+                ind: "1.急性冠心症。2.無Q波心肌梗塞及不穩定型心絞痛。",
+                dose: "Dalteparin 及 Enoxaparin: 1 mg/kg 皮下注射，每日兩次持續2至8天，與 aspirin 合用。",
+                contra: "1.對肝素過敏或對豬製品過敏者不可使用。2.血小板數目<10萬，不可使用。3.腎功能不佳時使用上需注意。"
+            },
+            { 
+                eng: "RTPA", ch: "血栓溶解劑 (rt-PA / Tenecteplase)", summary: "急性MI上升、腦中風黃金傳輸再灌流",
+                moa: "活化胞漿素原變成胞漿素→進一步將纖維蛋白溶解掉。",
+                ind: "1.急性心肌梗塞：ST節段上升或新形成LBBB且症狀在12小時內。2.急性缺血性腦中風：黃金時間內(3至4.5小時內)。3.急性肺栓塞。",
+                dose: "1.急性心肌梗塞：最大量100mg。急速滴注(1.5小時)：15mg IV push; 0.75 mg/kg (max 50mg) 滴注30分鐘; 0.5mg/kg (max 35mg) 滴注60分鐘。2.缺血性中風：0.9 mg/kg (最大量90mg)，總量10%先IV push 1分鐘，剩餘90%滴注60分鐘。",
+                contra: "絕對禁忌：任何出血性中風病史、一年內曾有中風、已知顱內腫瘤、活動性內出血、疑似主動脈剝離。相對禁忌：嚴重無法控制之高血壓(>180/110)、CPR超過10分鐘等。"
+            }
         ]
     },
     {
-        category: "🤎 插管麻醉用藥 (RSI 三部曲)", color: "#78350f", bg: "#fdf8f6",
+        category: "💚 心肌梗塞 - 血管舒張", color: "#10b981", bg: "#ecfdf5",
         list: [
-            { eng: "Lidocaine", ch: "利多卡因", note: "前置給藥：鈍化插管時的顱內壓(ICP)反射與氣管刺激。" },
-            { eng: "Atropine", ch: "阿托品", note: "前置給藥：預防小兒插管或使用迷走反射引發的心搏過緩。" },
-            { eng: "Fentanyl", ch: "芬太尼", note: "前置給藥：強力鴉片止痛，鈍化插管交感神經引起的血壓飆升。" },
-            { eng: "Propofol", ch: "丙泊酚 / 牛奶針", note: "鎮靜誘導：極快速短效鎮靜麻醉藥，但注意會降低血壓。" },
-            { eng: "Etomidate", ch: "乙妥咪酯", note: "鎮靜誘導：RSI誘導首選，對心血管極穩定，完全不影響血壓。" },
-            { eng: "Midazolam", ch: "米達唑侖", note: "鎮靜誘導：短效BZD，具備順行性健忘與優異的鎮靜抗抽搐效果。" },
-            { eng: "Ketamine", ch: "K他命", note: "鎮靜誘導：分離性麻醉，具支氣管擴張與升壓效果，適合休克者。" },
-            { eng: "Rocuronium", ch: "羅庫溴銨", note: "肌肉鬆弛：非去極化肌肉鬆弛劑，無肌束顫動副作用，維持30-60分。" },
-            { eng: "Succinylcholine", ch: "琥珀膽鹼", note: "肌肉鬆弛：去極化肌鬆劑，起效最快(60秒)，注意高血鉀禁忌。" }
+            { 
+                eng: "NTG", ch: "硝化甘油", summary: "缺血胸痛一線、擴張冠狀動脈、右室梗塞禁用",
+                moa: "1.對缺血造成的心絞痛病患是一種有效的止痛劑。2.對血液動力學有利，包括擴張冠狀動脈，增加心臟血液及氧氣供應量，周邊動脈床和靜脈的舒張。",
+                ind: "1.心絞痛或懷疑缺血性胸痛之第一線治療。2.急性心肌梗塞、鬱血性心衰竭、高血壓危症併急性冠心症或肺水腫。",
+                dose: "1.舌下含片：每五分鐘一錠(0.6mg)。2.靜脈滴注：初始10~20µg/min，每5~10 min調增5~10µg/min，視症狀及血壓調整。",
+                contra: "1.收縮壓不可低於90mmHg。2.使用本藥時，病人要坐著或躺下。3.禁使用於：低血壓、嚴重緩脈或頻脈、右心室梗塞、24小時內使用過壯陽藥。"
+            },
+            { 
+                eng: "Morphine", ch: "嗎啡", summary: "強效止痛、血管舒張、降低前負荷",
+                moa: "1.有良好的止痛效果，尤其是持續性疼痛。2.為一種靜脈舒張劑，可減少心室前負荷和氧氣需求量。",
+                ind: "1.急性冠心症引起之胸痛對NTG 無效時。2.急性心因性肺水腫(收縮壓需≥90 mmHg)。",
+                dose: "1.每5~30分鐘給予2~4mg 靜脈注射超過1~5分鐘。2.緩慢注射，視效果增加劑量。",
+                contra: "1.會抑制呼吸，在急性肺水腫呼吸衰竭的病人要小心。2.血容過低之病人會引起低血壓。3.解毒劑為 Naloxone。"
+            },
+            { 
+                eng: "ACEI", ch: "血管收縮素轉換酶抑制劑 (Enalapril/Captopril)", summary: "抑制血管收縮、梗塞後降低死亡率",
+                moa: "1.ACEI 抑制血管收縮素I不能變成血管收縮素II，抑制收縮血管→降血壓。2.AMI後病人使用ACEI可降低死亡率。",
+                ind: "1.懷疑急性心肌梗塞且有連續兩個以上的胸前導極有ST節段上升。2.急性心肌梗塞併左心室功能異常。3.高血壓、心臟衰竭且沒有低血壓。",
+                dose: "通常由低劑量開始，於24-48小時逐漸加至全劑量：Enalapril起始2.5mg, 加至20mg BID；Captopril起始6.25mg, 加至25~50mg TID。",
+                contra: "1.懷孕為禁忌症。2.ACEI 過敏者。3.兩側腎動脈狹窄之病人應避免使用。4.可能導致高血鉀。5.需於血壓穩定狀況下使用。"
+            },
+            { 
+                eng: "Nifedipine", ch: "硝苯地平 (Adalat)", summary: "阻斷鈣離子、速放型心肌梗塞禁用",
+                moa: "1.為鈣離子阻斷劑。2.阻止鈣離子進入平滑肌和心肌細胞，造成血管舒張，降低周邊血管阻力及後負荷。",
+                ind: "1.狹心症。2.高血壓(緩放型)。",
+                dose: "通常口服或舌下含服（心絞痛患者舌下給予時須咬破膠囊）。",
+                contra: "1.副作用：頭痛、末梢水腫、血管擴張。2.懷孕和哺乳期間不得使用。3.速放型的 Nifedipine 不可用於不穩定型心絞痛及最近發生過心肌梗塞之病人。"
+            },
+            { 
+                eng: "Sodium nitroprusside", ch: "醯鐵氰化鈉溶液", summary: "強力直接血管擴張劑、需避光管路處理",
+                moa: "1.強力快速作用的直接周邊血管擴張劑。2.可在體內產生NO來鬆弛血管平滑肌，降低左右心室的填充壓及前負荷，減少後負荷。3.降低左心室容積及壓力。",
+                ind: "1.高血壓危症。2.心臟衰竭、急性肺水腫(降低後負荷)。3.急性二尖瓣、主動脈瓣逆流。",
+                dose: "自 0.1 µg/kg/min開始，每3到5分鐘微調至效果出現(最大劑量 5.0 µg/kg/min)。需用精密輸液幫浦。",
+                contra: "1.對光敏感，所有容器管路要以鋁箔包覆。2.可造成低血壓、硫氰酸鹽中毒。3.可加重肺內血液分流，導致低血氧症。"
+            }
         ]
     },
     {
-        category: "🩷 鴉片解毒 / 矯正酸中毒 / 止血", color: "#ec4899", bg: "#fdf2f8",
+       category: "🟪 中樞神經系列 - 鎮靜、抗癲癇與子癲症", color: "#db2777", bg: "#fdf2f8",
         list: [
-            { eng: "Naloxone", ch: "納洛酮", note: "鴉片解毒：Morphine, Fentanyl 或海洛因過量造成的特異解毒劑。" },
-            { eng: "Sodium bicarbonate", ch: "碳酸氫鈉 (Jusom)", note: "矯正酸中毒高血鉀：鹼化血液使鉀移入細胞，亦解TCA中毒。" },
-            { eng: "Tranexamic acid", ch: "斷血炎 (TXA)", note: "止血：外傷大出血、產後大出血，防止纖維蛋白溶解以強力止血。" }
+            { 
+                eng: "BZD類 (如 Midazolam / Diazepam)", ch: "苯二氮䓬類鎮靜抗癲癇藥", summary: "中樞神經抑制、安眠、機轉為結合GABA受體",
+                moa: "1.結合在中樞神經的 GABA-A 受體，加強 GABA 的抑制效果，使氯離子通道打開、細胞膜過極化。2.具鎮靜、安眠、抗焦慮、肌肉鬆弛及抗痙攣（抗癲癇）作用。",
+                ind: "1.癲癇重積狀態 (Status Epilepticus) 或急性抽搐發作。2.手術或醫療處置（如插管）前之誘導與鎮靜。3.嚴重焦慮或恐慌狀態。",
+                dose: "依特定品項而定。例如 Midazolam: 靜脈注射 0.15~0.35 mg/kg 誘導鎮靜，或 2~5 mg 緩慢靜推止抽搐；Diazepam (Valium): 5~10 mg 緩慢靜脈注射（速率不超過 5mg/min）。",
+                contra: "1.常見副作用為嗜睡、共濟失調、低血壓及呼吸抑制，需密切監測呼吸與血氧。2.孕婦、重症肌無力及急性狹角型青光眼患者禁用或慎用。3.解毒劑（拮抗劑）為 Flumazenil。"
+            },
+            { 
+                eng: "Flumazenil", ch: "馬西尼 / 安易醒 (Anexate)", summary: "BZD類藥物特異性拮抗劑、解毒劑",
+                moa: "1.專一性 BZD 藥物的拮抗劑，阻斷作用在 BZD受器作用的中樞神經系統。",
+                ind: "單純因 benzodiazepine(BZD)藥物過量所導致的呼吸抑制及鎮定作用。",
+                dose: "1.初始劑量：0.2mg 靜脈注射15秒。2.第二劑量：0.3mg 靜脈注射30秒。3.第三劑量：0.5mg 靜脈注射超過30秒。可每分鐘重複一次至總劑量達3mg。",
+                contra: "1.作用時間可能沒有BZD藥物長，需監測再發性呼吸抑制。2.勿用於懷疑三環抗憂鬱劑(TCA)中毒情況。3.勿用於易發生抽搐情況。"
+            },
+            { 
+                eng: "MgSO4", ch: "硫酸鎂 (用於子癲症)", summary: "中樞神經抑制、預防及控制子癲症抽搐",
+                moa: "阻斷神經肌肉傳導，抑制中樞神經系統，具有抗痙攣作用，並可使周邊血管擴張，降低血壓。",
+                ind: "預防及控制妊娠毒血症引發之子癲症(Eclampsia)抽搐發作。",
+                dose: "通常給予 4-6 g 靜脈緩慢輸注，之後以 1-2 g/hr 持續維持滴注（臨床請依照救護常規或醫囑執行）。",
+                contra: "Reflex(膝反射)消失、呼吸抑制及尿量減少等鎂中毒徵象。解毒劑為鈣離子製劑。"
+            }
         ]
     },
     {
-        category: "🩻 抗鉀七招 (高血鉀緊急處理)", color: "#4b5563", bg: "#f3f4f6",
+        category: "🟩 支氣管擴張劑", color: "#059669", bg: "#ecfdf5",
         list: [
-            { eng: "𝖢𝖺𝟤+ 離子", ch: "氯化鈣 / 葡萄糖酸鈣", note: "第一招：穩定心肌細胞膜電位，防止高血鉀引發致命性心律不整。" },
-            { eng: "Sodium bicarbonate", ch: "碳酸氫鈉 (塞進細胞)", note: "第二招：鹼化血液，使 H+ 排出細胞，驅使 K+ 移入細胞。" },
-            { eng: "Glucose + RI", ch: "葡萄糖 + 胰島素 (塞進細胞)", note: "第三招：RI引導糖分利用，並協同將大量周邊鉀離子帶入細胞。" },
-            { eng: "A + B", ch: "Atrovent + Albuterol (塞進細胞)", note: "第四招：Beta-2刺激劑(Albuterol)高劑量吸入可驅使鉀進細胞。" },
-            { eng: "Lasix", ch: "移除：利尿劑", note: "第五招：排鉀型利尿劑，強迫鉀離子隨尿液排出體外。" },
-            { eng: "血液透析", ch: "移除：Hemodialysis", note: "第六招：洗腎。移除體內多餘鉀離子最徹底、最迅速的終極處置。" },
-            { eng: "陽離子交換樹脂", ch: "移除：Cation exchange resin", note: "第七招：如 Kayexalate，在腸道內進行陽離子交換隨糞便排鉀。" }
+            { 
+                eng: "Atrovent", ch: "可必特/抗膽鹼支氣管擴張劑 (Ipratropium)", summary: "吸入性抗膽鹼藥物",
+                moa: "（待補充...）",
+                ind: "（待補充...）",
+                dose: "（待補充...）",
+                contra: "（待補充...）"
+            },
+            { 
+                eng: "Albuterol", ch: "速效支氣管擴張劑 (Ventolin)", summary: "放鬆支氣管平滑肌、急性氣喘發作",
+                moa: "合成的非兒茶酚胺類藥物，活化β2受體→放鬆支氣管平滑肌。",
+                ind: "1.急性氣喘發作。2.COPD。3.支氣管炎、支氣管痙攣。",
+                dose: "吸入方式給藥。",
+                contra: "副作用：心搏過速、顫抖、噁心、頭痛等症狀，應停藥儘速送醫。"
+            }
+        ]
+    },
+    {
+        category: "🟦 利尿劑", color: "#0284c7", bg: "#f0f9ff",
+        list: [
+            { 
+                eng: "Furosemide", ch: "強效利尿劑 (Lasix/Rasitol)", summary: "抑制鈉再吸收、急性肺水腫第一線用藥",
+                moa: "1.很強的利尿劑，抑制腎臟對鈉離子的再吸收(較慢產生)，也會局部刺激前列腺素產生，使靜脈和肺臟血管阻力下降(5min 內作用)。",
+                ind: "1.急性肺水腫併SBP ≥90mmHg，無休克徵象(肺水腫第一線用藥)。2.血容增加之高血壓危症。3.鬱血性心臟衰竭，SBP≥90mmHg，無休克徵象。",
+                dose: "1. 靜脈滴注 0.5-1.0 mg/kg 超過1~2分鐘。2. 若無反應，加倍劑量至2.0mg/kg 緩慢注射超過1~2分鐘。",
+                contra: "可能導致脫水、低血容、低血壓、低血鉀、其他電解質不平衡。"
+            },
+            { 
+                eng: "Mannitol", ch: "甘露醇", summary: "高滲透利尿劑、神經急症降腦壓",
+                moa: "1.為高滲透利尿劑。降腦壓(15分鐘作用)、利尿(1~3小時作用)。",
+                ind: "神經系統急症中有顱內壓升高時。",
+                dose: "1. 0.5-1 g/kg 靜脈滴注5~10分鐘。2.需要時可每4~6小時追加 0.25-2 g/kg。",
+                contra: "1.監測體體積與血清滲透壓(勿超過310 mOsm/kg)。2.腎功能衰竭者要小心使用。"
+            }
+        ]
+    },
+    {
+        category: "🟪 插管麻醉用藥 - 前置給藥", color: "#4f46e5", bg: "#e0e7ff",
+        list: [
+            { 
+                eng: "Lidocaine", ch: "利多卡因 (插管前置給藥)", summary: "降低插管引起的顱內壓升高與氣管痙攣反應",
+                moa: "阻斷鈉離子通道，鈍化氣道反射，能抑制插管刺激所引發的腦壓升高與交感神經興奮反應。",
+                ind: "快速序列插管(RSI)前置給藥，特別適用於具顱內壓升高風險(如頭部外傷)或氣道高敏感(如氣喘)病患。",
+                dose: "插管前 2-3 分鐘給予 1.0 - 1.5 mg/kg 靜脈注射。",
+                contra: "已有嚴重心臟傳導阻滯或對局部麻醉劑過敏者禁用。"
+            },
+            { 
+                eng: "Atropine", ch: "阿托平 (插管前置給藥)", summary: "預防迷走神經興奮引起之心搏過緩",
+                moa: "抗蕈毒鹼副交感神經抑制劑，可阻斷迷走神經反射，並能減少呼吸道分泌物。",
+                ind: "小兒插管前置給藥，或預防因使用 Succinylcholine 及喉頭鏡刺激引起的反射性心搏過緩。",
+                dose: "通常給予 0.01 - 0.02 mg/kg 靜脈注射（臨床請依照救護常規執行）。",
+                contra: "心肌缺血患者需小心其增加心肌耗氧量。"
+            },
+            { 
+                eng: "Fentanyl", ch: "吩坦尼", summary: "強效鴉片類止痛劑",
+                moa: "（待補充...）",
+                ind: "（待補充...）",
+                dose: "（待補充...）",
+                contra: "（待補充...）"
+            }
+        ]
+    },
+    {
+        category: "🟫 插管麻醉用藥 - 鎮靜", color: "#78350f", bg: "#fef3c7",
+        list: [
+            { 
+                eng: "Propoful", ch: "異丙酚 (Propofol)", summary: "誘導麻醉、快速短效鎮靜劑",
+                moa: "（待補充...）",
+                ind: "（待補充...）",
+                dose: "（待補充...）",
+                contra: "（待補充...）"
+            },
+            { 
+                eng: "Etomidate", ch: "乙omidate", summary: "對血行動力學穩定的麻醉誘導藥",
+                moa: "（待補充...）",
+                ind: "（待補充...）",
+                dose: "（待補充...）",
+                contra: "（待補充...）"
+            },
+            { 
+                eng: "Midazolam", ch: "導眠靜 (Dormicum)", summary: "BZD類、抽搐發作或插管前鎮靜給藥",
+                moa: "Benzodiazepine (BZD)類。可作為插管前的鎮靜給藥。",
+                ind: "失眠、焦慮、恐慌症、抽搐、癲癇發作的第一線藥物、插管鎮靜誘導。",
+                dose: "IV或IM: 0.15-0.35mg/kg (Amp: 5mg/1ml)。",
+                contra: "使用BZD 會有嗜睡、意識模糊、呼吸抑制甚至血壓下降的情形，需密切監控病患狀況。"
+            },
+            { 
+                eng: "Katemine", ch: "K他命 (Ketamine)", summary: "解離性麻醉劑",
+                moa: "（待補充...）",
+                ind: "（待補充...）",
+                dose: "（待補充...）",
+                contra: "（待補充...）"
+            }
+        ]
+    },
+    {
+        category: "⬛ 插管麻醉用藥 - 肉鬆 (肌肉鬆弛劑)", color: "#1e293b", bg: "#f1f5f9",
+        list: [
+            { 
+                eng: "Rocuronium", ch: "羅庫溴銨", summary: "非去極化型肌肉鬆弛劑",
+                moa: "（待補充...）",
+                ind: "（待補充...）",
+                dose: "（待補充...）",
+                contra: "（待補充...）"
+            },
+            { 
+                eng: "Succinylcholine", ch: "琥珀膽鹼", summary: "去極化型肌肉鬆弛劑、高血鉀考點禁用",
+                moa: "（待補充...）",
+                ind: "（待補充...）",
+                dose: "（待補充...）",
+                contra: "（待補充...）"
+            }
+        ]
+    },
+    {
+        category: "🟪 單項臨床專科急救用藥 (解毒/酸中毒/止血)", color: "#6b7280", bg: "#f9fafb",
+        list: [
+            { 
+                eng: "Naloxone", ch: "解麻注射液", summary: "鴉片類藥物中毒解毒劑、競爭抑制受體",
+                moa: "1.人工合成的鴉片類受體競爭抑制劑。",
+                ind: "鴉片類藥物中毒引起之呼吸和神經系統抑制。",
+                dose: "每2分鐘給予 0.4~2.0mg，可在短時間(10分鐘)內給到10 mg。",
+                contra: "1.會出現鴉片類藥物戒斷症狀。2.效果未必比鴉片類藥物長，需監測再發性之呼吸抑制。"
+            },
+            { 
+                eng: "Sodium bicarbonate", ch: "碳酸氫鈉 (Jusomin)", summary: "鹼化血液、高血鉀、特定藥物中毒酸中毒",
+                moa: "1.鹼化藥物可升高血中 bicarbonate 濃度及血液酸鹼值及矯正代謝性酸中毒臨床現象。",
+                ind: "1. 已知有高血鉀症。2. 已知對碳酸氫鈉有效之酸中毒、特定藥物中毒(三環抗憂鬱劑等)。3. 急救過程太久通氣良好時。",
+                dose: "依臨床評估給藥（例如常用 1 mEq/kg 緩慢推注）。",
+                contra: "1.心跳停止時最佳之緩衝劑是心肺復甦術及適當之通氣。2.不建議例行性使用於心跳停止病人。"
+            },
+            { 
+                eng: "Tranecamic acid", ch: "斷血炎 (TXA / Transamin)", summary: "外傷大出血早期止血、1小時內給藥考點",
+                moa: "1.有止血、抗過敏、抗炎症的效果。2.近來研究證使，使用在創傷出血的病患身上(1小時內)，會減低其死亡率。",
+                ind: "手術時之異常出血、腎出血及創傷出血早期止血。",
+                dose: "0.75mg/kg, 超過10~15分鐘給予，接著以 5~15ug/kg/min調整臨床療效。",
+                contra: "1.對正在接受凝血酶(thrombin)之病患為禁忌症。2.IV時應緩慢進行、IM時應避開神經通過部位。"
+            }
+        ]
+    },
+    {
+        category: "🟥 抗鉀七招", color: "#dc2626", bg: "#fef2f2",
+        list: [
+            { 
+                eng: "𝐂𝐚𝟐+離子", ch: "Calcium Chloride / Gluconate", summary: "【第一招：穩定細胞膜】防高血鉀引發致命心律不整",
+                moa: "拮抗鉀離子對心肌細胞膜電位的毒性作用，穩定心肌細胞膜，防止惡化為VF/Asystole。不降低血鉀濃度。",
+                ind: "高血鉀症引起之心電圖變化（如波形變寬、T波高尖等）。",
+                dose: "10% Calcium Chloride 5-10 mL 靜脈注射；或 Calcium Gluconate 10-20 mL 靜脈注射。",
+                contra: "毛地黃中毒引起之高血鉀禁用。"
+            },
+            { 
+                eng: "Sodium bicarbonate", ch: "碳酸氫鈉 (抗鉀招式)", summary: "【第二招：塞進細胞】鹼化血液促使鉀離子進入細胞內",
+                moa: "提高血液pH值，引發細胞內外離子交換（氫離子走出細胞、補償性使鉀離子移入細胞內），從而降低血清鉀濃度。",
+                ind: "高血鉀症合併代謝性酸中毒。",
+                dose: "常用劑量 50 mEq (1 amp) 緩慢靜脈推注或加入輸液滴注。",
+                contra: "通氣不良或代謝性鹼中毒患者禁用。"
+            },
+            { 
+                eng: "Glucose + RI", ch: "胰島素加葡萄糖 (GI therapy)", summary: "【第三招：塞進細胞】促使鉀離子協同移入細胞內",
+                moa: "（待補充...）",
+                ind: "（待補充...）",
+                dose: "（待補充...）",
+                contra: "（待補充...）"
+            },
+            { 
+                eng: "A + B", ch: "吸入性支氣管擴張劑 (如高劑量 Albuterol)", summary: "【第四招：塞進細胞】活化β2受體促進鉀離子移入細胞",
+                moa: "刺激β2腎上腺素受體，活化細胞膜上的鈉鉀幫浦(Na+-K+ ATPase)，加速血清中的鉀離子移入細胞內。",
+                ind: "高血鉀處置之輔助療法。",
+                dose: "常規吸入治療，通常使用比氣喘更高的劑量（臨床請遵循救護常規或醫囑）。",
+                contra: "嚴重嚴重心搏過速患者需審慎評估。"
+            },
+            { 
+                eng: "Lasix", ch: "強力利尿劑 (Furosemide / 移除招)", summary: "【第五招：移除】由腎臟排尿排出鉀離子",
+                moa: "抑制腎臟髓質粗上升支對鈉氯的再吸收，同時增加鉀離子在遠曲小管的排泄，經由尿液將鉀離子排出體外。",
+                ind: "高血鉀症且病患仍有排尿功能、容積過載。",
+                dose: "靜脈滴注 40 - 80 mg 靜脈注射（視病患平日用量調整）。",
+                contra: "無尿症、嚴重低血容休克患者禁用。"
+            },
+            { 
+                eng: "血液透析", ch: "Hemodialysis", summary: "【第六招：移除】最迅速徹底清除血鉀的終極方法",
+                moa: "（待補充...）",
+                ind: "（待補充...）",
+                dose: "（待補充...）",
+                contra: "（待補充...）"
+            },
+            { 
+                eng: "陽離子交換樹脂", ch: "Kayeexalate / Calcium Resonium", summary: "【第七招：移除】由腸胃道交換排出鉀離子",
+                moa: "（待補充...）",
+                ind: "（待補充...）",
+                dose: "（待補充...）",
+                contra: "（待補充...）"
+            }
         ]
     }
 ];
 
+// 📉 動態摺疊面板核心 JS 渲染與控制引擎
 const dynamicDrugSections = document.getElementById('dynamicDrugSections');
-clinicalSections.forEach(sec => {
+clinicalSections.forEach((sec, secIdx) => {
     const secDiv = document.createElement('div');
     secDiv.className = 'drug-section';
     secDiv.style.borderLeftColor = sec.color;
     secDiv.innerHTML = `<div class="section-header" style="color:${sec.color}">${sec.category}</div>`;
+    
     const listWrapper = document.createElement('div');
     listWrapper.className = 'drug-list-container';
-    sec.list.forEach(drug => {
+    
+    sec.list.forEach((drug, drugIdx) => {
+        const uniqueId = `accordion-${secIdx}-${drugIdx}`;
+        
         const rowCard = document.createElement('div');
         rowCard.className = 'drug-row-card';
+        
+        // 建立上半部主要列
+        const mainRow = document.createElement('div');
+        mainRow.className = 'drug-main-row';
+        
+        // 左側：英文/中文 發音點擊區
         const trigger = document.createElement('div');
         trigger.className = 'drug-trigger';
         trigger.style.backgroundColor = sec.bg;
-        trigger.innerHTML = `<div class="drug-eng">${drug.eng}</div><div class="drug-ch">${drug.ch}</div><div class="drug-speak-icon">📢 點擊發音</div>`;
-        trigger.addEventListener('click', () => { speakDrug(drug.eng); });
-        const info = document.createElement('div');
-        info.className = 'drug-info';
-        info.innerText = drug.note;
-        rowCard.appendChild(trigger);
-        rowCard.appendChild(info);
+        trigger.innerHTML = `
+            <div class="drug-eng">${drug.eng}</div>
+            <div class="drug-ch">${drug.ch}</div>
+            <div class="drug-speak-icon">📢 點擊英文發音</div>
+        `;
+        trigger.addEventListener('click', (e) => {
+            e.stopPropagation(); // 阻止冒泡
+            speakDrug(drug.eng);
+        });
+        
+        // 右側：摘要與面板展開點擊區
+        const toggleBtn = document.createElement('div');
+        toggleBtn.className = 'drug-info-toggle';
+        toggleBtn.innerHTML = `
+            <div><strong>💡 臨床說明區：</strong>${drug.summary}</div>
+            <div class="toggle-arrow" id="arrow-${uniqueId}">▼</div>
+        `;
+        
+        // 點擊右側區塊，觸發「動態摺疊面板」
+        toggleBtn.addEventListener('click', () => {
+            toggleAccordion(uniqueId);
+        });
+        
+        mainRow.appendChild(trigger);
+        mainRow.appendChild(toggleBtn);
+        
+        // 建立下半部：隱藏的摺疊詳細內容面板
+        const accordionContent = document.createElement('div');
+        accordionContent.className = 'drug-accordion-content';
+        accordionContent.id = uniqueId;
+        accordionContent.innerHTML = `
+            <div class="detail-item"><span class="detail-label">🧠 1.急救藥理作用:</span><span class="detail-text">${drug.moa}</span></div>
+            <div class="detail-item"><span class="detail-label">🎯 2.適應症:</span><span class="detail-text">${drug.ind}</span></div>
+            <div class="detail-item"><span class="detail-label">💉 3.劑量:</span><span class="detail-text" style="color:#b22222; font-weight:500;">${drug.dose}</span></div>
+            <div class="detail-item"><span class="detail-label">⚠️ 4.注意事項/禁忌:</span><span class="detail-text">${drug.contra}</span></div>
+        `;
+        
+        rowCard.appendChild(mainRow);
+        rowCard.appendChild(accordionContent);
         listWrapper.appendChild(rowCard);
     });
     secDiv.appendChild(listWrapper);
     dynamicDrugSections.appendChild(secDiv);
 });
 
+// 🔄 摺疊面板開關邏輯
+function toggleAccordion(id) {
+    const content = document.getElementById(id);
+    const arrow = document.getElementById('arrow-' + id);
+    
+    if (content.style.display === 'block') {
+        content.style.display = 'none';
+        arrow.style.transform = 'rotate(0deg)';
+    } else {
+        // 先將其他打開的摺疊面板收合，保持畫面整潔
+        const allContents = document.querySelectorAll('.drug-accordion-content');
+        const allArrows = document.querySelectorAll('.toggle-arrow');
+        allContents.forEach(c => c.style.display = 'none');
+        allArrows.forEach(a => a.style.transform = 'rotate(0deg)');
+        
+        content.style.display = 'block';
+        arrow.style.transform = 'rotate(180deg)';
+    }
+}
+
 function speakDrug(text) {
     if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
-        let cleanText = text.replace("+", " plus ").replace("/", " or ").replace("𝖢𝖺𝟤+", "Calcium");
-        if(cleanText.includes("A + B")) cleanText = "A plus B";
+        let cleanText = text.replace("+", " plus ").replace("/", " or ");
         const utterance = new SpeechSynthesisUtterance(cleanText);
         utterance.lang = 'en-US';
         utterance.rate = 0.82; 
